@@ -1,0 +1,79 @@
+<!DOCTYPE HTML>
+<html> 
+	<head>
+		<title>Test with mongo</title>
+
+	    <!-- Bootstrap -->
+	    <link href="css/bootstrap.css" rel="stylesheet">
+		<script type="text/javascript" src="js/angular.js"></script>
+		<script type="text/javascript" src="js/script.js"></script>
+		<script type="text/javascript" src="js/jquery-1.11.0.min.js"></script>
+
+
+	</head>
+<body data-ng-app>
+	<div data-ng-controller="collectionController" class="container" style="width:20%">
+
+ 		<div class="row">
+	 		<div class="col-md-9"> 			
+				<select class="form-control" style="" ng-model="currentCollection"
+				ng-options="collection as collection.name for collection in collections" ng-change="loadFields()">
+					<option value="">Collections</option>
+				</select>
+	 		</div>
+
+	 		<div class="col-md-3">
+				<input class="btn" type="button" data-ng-click="showCollections()" value="show collections" />
+	 		</div>
+ 		</div>
+
+
+		<form data-ng-show="showFields">
+			<div class="form-group" ng-repeat="(key, value) in currentCollection.fields">
+				<label for={{key}}>{{key}}</label>
+				<input ng-model="currentCollection.fields[key]" class="form-control" type="text"
+				placeholder={{currentCollection.name}}.{{key}}
+				name={{key}}
+				id="{{currentCollection.name}}_{{key}}" /> 
+			</div>
+
+			<div class="row" data-ng-show="showNewField">
+				<div class="col-md-10">
+					<input data-ng-model="newFieldName" class="form-control" type="text"/> 
+				</div>
+				<div class="col-md-2">
+					<input class="btn" type="button" value="+" data-ng-click="addField()" /> 
+				</div>
+			</div>
+
+			<input class="btn" type="submit" data-ng-click="loadData()" value="Pesquisar" />
+			<input class="btn" type="button" data-ng-click="showNewField = !showNewField" value="Adicionar campo" />
+			
+		</form>
+
+		
+		<div id="container" class="">
+			<ul >
+				<li data-ng-repeat="document in data" ng-include="'field_renderer.html'">
+				</li>
+			</ul>
+			<form onsubmit="return false;" id="form-container" role="form"></form>
+		</div>
+	</div>	
+	<script type="text/ng-template" id="field_renderer.html">
+			<ul>
+				<li ng-repeat="(key, value) in document">
+					{{key}}:	
+
+					<span ng-if="typeOf(value) != 'object'">{{value}}</span>
+					
+					<ul ng-if="typeOf(value) == 'object'">
+						<li ng-repeat="document in value" ng-include="'field_renderer.html'">
+						</li>
+					</ul>
+				</li>
+			</ul>
+			<hr>
+	</script>
+</body>
+</html>
