@@ -16,17 +16,54 @@ var collectionController = function($scope){
 			]
 		*/
 	
-	var http = defineXmlhttpByBrowser();
-	http.onload = function() {
-
-		$scope.collections = JSON.parse(http.responseText);
+	var listCollectionsCallback = function() {
+		$scope.collections = JSON.parse(this.responseText);
 		//the response already come with "name" field (name of collection)
-
 	};
-	http.open("POST", "listCollections.php", false);	
-	http.send();
+	executeConnection("POST", "php/listCollections.php", false, null, listCollectionsCallback);
+
+	$scope.loadFields = function() {
+		//not implemented yet
+		if(!$scope.collections.persistFieldValues)
+			$scope.clearFields();
+
+		if($scope.currentCollection.fields) {
+			//if a connection has already been made, doesn't need to do it again
+			return;
+		}
+
+		var data = new FormData(); //define the parameters
+		data.append("collectionName", $scope.currentCollection.name);
 
 
+		var onloadCallback = function() {
+			$scope.currentCollection.fields = JSON.parse(this.responseText);
+			$scope.showFields = true;
+		};
+
+		executeConnection("POST", "php/listFields.php", false, data, onloadCallback);
+	}
+
+	$scope.loadData = function() {
+		var data = new FormData();
+		data.append("collectionName", $scope.currentCollection.name);
+		data.append("fields", JSON.stringify($scope.currentCollection.fields));
+
+		//called when the load document was done
+		onloadCallback = function() {
+			$scope.data = (JSON.parse(this.responseText));
+		};
+		executeConnection("POST", "php/listData.php", false, data, onloadCallback);
+	}
+
+	function executeConnection(type, url, sync, data, onload) {
+		var http = defineXmlhttpByBrowser();
+
+		http.onload = onload;
+
+		http.open(type, url, sync);
+		http.send(data);
+	}
 	function defineXmlhttpByBrowser() {
 		if (window.XMLHttpRequest)
 			return new XMLHttpRequest();
@@ -34,30 +71,6 @@ var collectionController = function($scope){
 			return new ActiveXObject("Microsoft.XMLHTTP");
 	}
 
-	$scope.loadFields = function() {
-		if(!$scope.persistFieldValues)
-			$scope.clearFields();
-
-		//define the parameters
-		var data = new FormData();
-
-		if($scope.currentCollection.fields) {
-			return;
-		}
-
-		data.append("collectionName", $scope.currentCollection.name);
-		data.append("fields", "");
-
-
-		var http = defineXmlhttpByBrowser();
-		http.onload = function() {
-			$scope.currentCollection.fields = JSON.parse(http.responseText);
-
-			$scope.showFields = true;
-		};
-		http.open("POST", "listFields.php", false);
-		http.send(data);
-	}
 	$scope.addField = function() {
 		$scope.showNewField = false; //hide the input
 
@@ -70,6 +83,7 @@ var collectionController = function($scope){
 			$scope.currentCollection.fields[key] = "";
 	}
 
+	//only console.log
 	$scope.showCollections = function() {
 		console.log("Collections: ");
 		console.log($scope.collections);
@@ -77,28 +91,9 @@ var collectionController = function($scope){
 		console.log("\nactual collection: ");
 		console.log($scope.currentCollection);
 
-	}
+	}	
 
-	$scope.loadData = function() {
-		var data = new FormData();
-/*
-		if($scope.currentCollection.fields) {
-			return;
-		}*/
-
-		data.append("collectionName", $scope.currentCollection.name);
-		data.append("fields", JSON.stringify($scope.currentCollection.fields));
-
-
-		var http = defineXmlhttpByBrowser();
-		http.onload = function() {
-			//console.log(JSON.parse(http.responseText));
-			$scope.data = (JSON.parse(http.responseText));
-		};
-		http.open("POST", "listData.php", false);
-		http.send(data);		
-	}
-
+	//used in recursive template (show data)
 	$scope.typeOf = function(input) {
 	    return typeof input;
 	  }
