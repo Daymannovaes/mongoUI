@@ -1,3 +1,5 @@
+var outScope;
+
 var collectionController = function($scope){
 		/*
 			$scope.collections = [
@@ -15,6 +17,7 @@ var collectionController = function($scope){
 				},
 			]
 		*/
+	outScope = $scope;
 	
 	var listCollectionsCallback = function() {
 		$scope.collections = JSON.parse(this.responseText);

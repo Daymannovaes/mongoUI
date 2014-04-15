@@ -29,6 +29,7 @@ function loadFields($collection) {
 		return;
 	}
 	//echo "\nCampos buscados com sucesso: ";
+	
 	//return only the column names
 	$keys = array_keys($cursor);
 	foreach($keys as $key) {

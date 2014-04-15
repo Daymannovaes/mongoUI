@@ -10,7 +10,7 @@ function connect($collectionName) {
 	$db = $connection->humanidade;
 
 	$collection = $db->selectCollection($collectionName);
-	//echo "\ncollection: ". $collection->count();
+	//echo "\ncollection count: ". $collection->count();
 
 	if($collection->count()) {
 		loadFields($collection);
@@ -25,6 +25,7 @@ function loadFields($collection) {
 	$criteria = $_POST["fields"] ? (array)json_decode($_POST["fields"]) : "";
 	$criteria = deleteEmptyFields($criteria);
 
+
 	$cursor = $collection->find($criteria, Array("_id"=>0));
 
 	if(!$cursor) {
@@ -35,7 +36,8 @@ function loadFields($collection) {
 	foreach($cursor as $document) {
 		$data[] = $document;
 	}
-		echo json_encode($data);
+
+	echo json_encode($data);
 }
 
 //if a field is empty, it is deleted from the criteria array
