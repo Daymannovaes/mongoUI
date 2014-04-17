@@ -1,23 +1,44 @@
-var outScope;
+var $outScope;
 
 var collectionController = function($scope){
-		/*
-			$scope.collections = [
-				{
-					name: "pessoa",
-					columns: ["nome", "idade", "nacionalidade"]
-				},
-				{
-					name: "familia",
-					columns: ["nome", "pessoas"]
-				},
-				{
-					name: "cidade",
-					columns: ["nome", "bairro", "familias", "pontosTuristicos"]
-				},
-			]
-		*/
-	outScope = $scope;
+	/* 
+	 * Only for debug and test where the mongoDB not work
+	 * like teknisa. So, to acess the intern methods of
+	 * the controller is used the $outScope
+	*/
+		$outScope = $scope;
+		$scope.addData = function() {
+			$scope.data = [];
+			$scope.data.push({nome:"dayman", idade:"18", a:"b"});
+			$scope.data.push({nome:"bru", idade:"19", nacionalidade:"brasil"});
+			$scope.data.push({nome:"outro", orgaos:[{peso:"100g", nome:"coracao"},{peso:"1g", nome:"oi"}]});
+		}
+
+		$scope.collections = [
+			{
+				name:"testCollection",
+				fields: {
+					nome: "",
+					campo1: "",
+					campo2: ""
+				}
+			},
+			{
+				name:"anotherCollection",
+				fields: {
+					firstField: ""
+				}
+			}
+		];
+		$scope.currentCollection = {
+				name:"testCollection",
+				fields: {
+					nome: "",
+					campo1: "",
+					campo2: ""
+				}
+			};
+	//end the forced data bind ($outScope)
 	
 	var listCollectionsCallback = function() {
 		$scope.collections = JSON.parse(this.responseText);
@@ -27,6 +48,7 @@ var collectionController = function($scope){
 
 	$scope.loadFields = function() {
 		//not implemented yet
+		$scope.showFields = true;
 		if(!$scope.collections.persistFieldValues)
 			$scope.clearFields();
 
@@ -40,7 +62,7 @@ var collectionController = function($scope){
 
 
 		var onloadCallback = function() {
-			$scope.currentCollection.fields = JSON.parse(this.responseText);
+			//$scope.currentCollection.fields = JSON.parse(this.responseText);
 			$scope.showFields = true;
 		};
 
@@ -102,3 +124,20 @@ var collectionController = function($scope){
 	  }
 
 };
+
+/*
+	$scope.collections = [
+		{
+			name: "pessoa",
+			columns: ["nome", "idade", "nacionalidade"]
+		},
+		{
+			name: "familia",
+			columns: ["nome", "pessoas"]
+		},
+		{
+			name: "cidade",
+			columns: ["nome", "bairro", "familias", "pontosTuristicos"]
+		},
+	]
+*/

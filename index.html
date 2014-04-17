@@ -13,7 +13,7 @@
 </head>
 <body data-ng-app>
 	<!-- top fixed nav bar -->
-	<nav ng-include="src='html/navbar-header.html'"
+	<nav data-ng-include="src='html/navbar-header.html'"
 	class=" navbar navbar-default navbar-fixed-top" role="navigation">
 		Loading navbar...
 	</nav>
@@ -25,8 +25,8 @@
 			<!-- Collections -->
 			<div class="row" style="border:;">
 				<div class="col-md-8"> 			
-					<select class="form-control" style="" ng-model="currentCollection"
-					ng-options="collection as collection.name for collection in collections" ng-change="loadFields()">
+					<select class="form-control" style="" data-ng-model="currentCollection"
+					data-ng-options="collection as collection.name for collection in collections" data-ng-change="loadFields()">
 						<option value="">Collections</option>
 					</select>
 				</div>
@@ -38,7 +38,7 @@
 			<!-- Fields -->
 			<div class="row" style="border:;">
 				<form data-ng-show="showFields">
-					<div class="form-group" ng-repeat="(key, value) in currentCollection.fields">
+					<div class="form-group" data-ng-repeat="(key, value) in currentCollection.fields">
 						<label for={{key}}>{{key}}</label>
 						<input data-ng-model="currentCollection.fields[key]" class="form-control" type="text"
 						placeholder={{currentCollection.name}}.{{key}}
@@ -58,7 +58,7 @@
 						</div>
 					</div>
 
-					<input class="btn" type="submit" data-ng-click="loadData()" value="Pesquisar" />
+					<input class="btn" type="submit" data-ng-click="loadData();addData()" value="Pesquisar" />
 					<input class="btn" type="button" data-ng-click="showNewField = !showNewField" value="Adicionar campo" />
 
 				</form>
@@ -67,24 +67,7 @@
 
 		<!-- Data -->
 		<div class="col-md-8" style="border:;">
-			<!-- Here will be the new recursive template -->
-			<div data-ng-repeat="document in data">
-				<table class="table table-striped table-hover">
-					<thead>
-						<tr>
-							<th data-ng-repeat="(key, value) in document">
-								{{key}}
-							</th>
-						</tr>
-					</thead>						
-					<tr>
-						<td data-ng-repeat="(key, value) in document">
-							<span data-ng-if="typeOf(value) != 'object'">{{value}}</span>
-							<span data-ng-if="typeOf(value) == 'object'">dropdown</span>
-						</td>
-					</tr>
-				</table>
-			</div>
+			<div data-ng-include="src='recursive-data-template.html'"></div>
 		</div>	
 	</div>	
 
@@ -107,6 +90,30 @@
 			</li>
 		</ul>
 		<hr>
+	</script>
+
+	<!-- Here will be the new recursive template -->
+	<script type="text/ng-template" id="recursive-data-template.html">
+		<div data-ng-repeat="document in data">
+			<table class="table table-striped table-hover">
+				<thead>
+					<tr>
+						<th data-ng-repeat="(key, data) in document">
+							{{key}}
+						</th>
+					</tr>
+				</thead>						
+				<tr>
+					<td data-ng-repeat="(key, data) in document">
+						<span data-ng-if="typeOf(data) != 'object'">{{data}}</span>
+						<span data-ng-if="typeOf(data) == 'object'">
+							<span data-ng-click="showData=!showData">Mostrar</span>
+							<div data-ng-show="showData" data-ng-include="'recursive-data-template.html'"><div>
+						</span>
+					</td>
+				</tr>
+			</table>
+		</div>
 	</script>
 </body>
 </html>
