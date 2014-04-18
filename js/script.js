@@ -6,7 +6,7 @@ var collectionController = function($scope){
 	 * like teknisa. So, to acess the intern methods of
 	 * the controller is used the $outScope
 	*/
-		$outScope = $scope;
+/*		$outScope = $scope;
 		$scope.addData = function() {
 			$scope.data = [];
 			$scope.data.push({nome:"dayman", idade:"18", a:"b"});
@@ -37,7 +37,7 @@ var collectionController = function($scope){
 					campo1: "",
 					campo2: ""
 				}
-			};
+			};*/
 	//end the forced data bind ($outScope)
 	
 	var listCollectionsCallback = function() {
@@ -48,7 +48,6 @@ var collectionController = function($scope){
 
 	$scope.loadFields = function() {
 		//not implemented yet
-		$scope.showFields = true;
 		if(!$scope.collections.persistFieldValues)
 			$scope.clearFields();
 
@@ -62,7 +61,7 @@ var collectionController = function($scope){
 
 
 		var onloadCallback = function() {
-			//$scope.currentCollection.fields = JSON.parse(this.responseText);
+			$scope.currentCollection.fields = JSON.parse(this.responseText);
 			$scope.showFields = true;
 		};
 
