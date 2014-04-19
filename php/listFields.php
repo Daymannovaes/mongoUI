@@ -1,5 +1,15 @@
 <?php  
 
+class ListFields {
+	private $connection;
+
+	public function __construct($connection = null, $collectionName = null) {
+		$this->connection = $connection ? $connection : new Connection();
+
+		$this->connection->selectCollection($collectionName);
+
+	}
+}
 if(isset($_POST["collectionName"]))
 	connect($_POST["collectionName"]);
 

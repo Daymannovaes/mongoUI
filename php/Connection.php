@@ -15,6 +15,17 @@ class Connection {
     	$this->collection = $collection;
     }
 
+    public function getCollectionNames() {
+        return $this->db->getCollectionNames();
+    }
+    public function close() {
+        $this->connection->close();
+    }
+    public function selectCollection($collectionName) {
+        $this->db->selectCollection($collectionName);
+    }
+
+// ---- GETTERS and SETTERS
     public function getConnection() {
         return $this->connection;
     }
@@ -37,10 +48,10 @@ class Connection {
     }
 
 }
-
+/*
 $con = new Connection(null, null, "a");
 
-/*var_dump($con->getConnection());
+var_dump($con->getConnection());
 var_dump($con->getDb());
 var_dump($con->getCollection());
 

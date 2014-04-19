@@ -44,7 +44,7 @@ var collectionController = function($scope){
 		$scope.collections = JSON.parse(this.responseText);
 		//the response already come with "name" field (name of collection)
 	};
-	executeConnection("POST", "php/listCollections.php", false, null, listCollectionsCallback);
+	executeConnection("POST", "php/ListCollections.php", false, null, listCollectionsCallback);
 
 	$scope.loadFields = function() {
 		//not implemented yet
@@ -65,7 +65,7 @@ var collectionController = function($scope){
 			$scope.showFields = true;
 		};
 
-		executeConnection("POST", "php/listFields.php", false, data, onloadCallback);
+		executeConnection("POST", "php/ListFields.php", false, data, onloadCallback);
 	}
 
 	$scope.loadData = function() {
@@ -77,7 +77,7 @@ var collectionController = function($scope){
 		onloadCallback = function() {
 			$scope.data = (JSON.parse(this.responseText));
 		};
-		executeConnection("POST", "php/listData.php", false, data, onloadCallback);
+		executeConnection("POST", "php/ListData.php", false, data, onloadCallback);
 	}
 
 	function executeConnection(type, url, sync, data, onload) {

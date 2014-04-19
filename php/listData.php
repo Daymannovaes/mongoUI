@@ -13,13 +13,13 @@ function connect($collectionName) {
 	//echo "\ncollection count: ". $collection->count();
 
 	if($collection->count()) {
-		loadFields($collection);
+		loadData($collection);
 	}
 
 	$connection->close();
 }
 
-function loadFields($collection) {
+function loadData($collection) {
 	//echo "\nIniciando busca de campos\n";
 
 	$criteria = $_POST["fields"] ? (array)json_decode($_POST["fields"]) : "";
