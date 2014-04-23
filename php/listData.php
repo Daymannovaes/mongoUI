@@ -26,7 +26,7 @@ function loadData($collection) {
 	$criteria = deleteEmptyFields($criteria);
 
 
-	$cursor = $collection->find($criteria, Array("_id"=>0));
+	$cursor = $collection->find($criteria);
 
 	if(!$cursor) {
 		echo "\nCampos não encontrados";
@@ -34,6 +34,7 @@ function loadData($collection) {
 	}
 
 	foreach($cursor as $document) {
+		$document = deleteIdField($document);
 		$data[] = $document;
 	}
 
@@ -45,6 +46,19 @@ function deleteEmptyFields($fields) {
 	foreach($fields as $key => $value) {
 		if($value == "")
 			unset($fields[$key]);
+	}
+	return $fields;
+}
+
+//delete all id fields recursively
+function deleteIdField($fields) {
+	//var_dump($fields);
+	if(isset($fields["_id"]))
+		unset($fields["_id"]);
+
+	foreach($fields as $key => $value) {
+		if(gettype($value) == "object" || gettype($value) == "array")
+			$fields[$key] = deleteIdField($value);
 	}
 	return $fields;
 }
