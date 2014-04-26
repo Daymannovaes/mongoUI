@@ -1,11 +1,11 @@
 var $outScope;
 
 var collectionController = function($scope){
-	/* 
+	/**
 	 * Only for debug and test where the mongoDB not work
 	 * like teknisa. So, to acess the intern methods of
 	 * the controller is used the $outScope
-	*/
+	 */
 /*		$outScope = $scope;
 		$scope.addData = function() {
 			$scope.data = [];
@@ -75,7 +75,11 @@ var collectionController = function($scope){
 
 		//called when the load document was done
 		onloadCallback = function() {
-			$scope.data = (JSON.parse(this.responseText));
+			try {
+				$scope.data = JSON.parse(this.responseText);
+			} catch(err) {
+				$scope.data = this.responseText;
+			}
 		};
 		executeConnection("POST", "php/ListData.php", false, data, onloadCallback);
 	}

@@ -23,13 +23,16 @@ function loadData($collection) {
 	//echo "\nIniciando busca de campos\n";
 
 	$criteria = $_POST["fields"] ? (array)json_decode($_POST["fields"]) : "";
-	$criteria = deleteEmptyFields($criteria);
 
+	$caster = $collection->findOne();
+	
+	$criteria = castCriteria($criteria, $caster);
+	$criteria = deleteEmptyFields($criteria);
 
 	$cursor = $collection->find($criteria);
 
-	if(!$cursor) {
-		echo "\nCampos não encontrados";
+	if(!$cursor->count()) {
+		echo "\nNenhum resultado encontrado";
 		return;
 	}
 
@@ -39,6 +42,15 @@ function loadData($collection) {
 	}
 
 	echo json_encode($data);
+}
+
+function castCriteria($criteria, $fields) {
+	foreach($fields as $key => $value) {
+		$type = gettype($value);
+		if($type == "double" || $type == "float" || $type == "int")
+			$criteria[$key] = (double)$criteria[$key];
+	}
+	return $criteria;
 }
 
 //if a field is empty, it is deleted from the criteria array

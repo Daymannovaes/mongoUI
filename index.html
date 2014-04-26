@@ -73,7 +73,8 @@
 
 	<!-- recursive template for data show -->
 	<script type="text/ng-template" id="recursive-data-template.html">
-		<div data-ng-repeat="document in data">
+		<span data-ng-if="typeOf(data) == 'string'">{{data}}</span>
+		<div data-ng-if="typeOf(data) != 'string'" data-ng-repeat="document in data">
 			<table class="table table-striped table-hover">
 				<thead>
 					<tr>
