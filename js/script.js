@@ -6,8 +6,8 @@ var collectionController = function($scope){
 	 * like teknisa. So, to acess the intern methods of
 	 * the controller is used the $outScope
 	 */
-/*		$outScope = $scope;
-		$scope.addData = function() {
+		$outScope = $scope;
+		/*$scope.addData = function() {
 			$scope.data = [];
 			$scope.data.push({nome:"dayman", idade:"18", a:"b"});
 			$scope.data.push({nome:"bru", idade:"19", nacionalidade:"brasil"});
@@ -47,28 +47,41 @@ var collectionController = function($scope){
 	executeConnection("POST", "php/ListCollections.php", false, null, listCollectionsCallback);
 
 	$scope.loadFields = function() {
-		//not implemented yet
-		if(!$scope.collections.persistFieldValues)
-			$scope.clearFields();
-
-		if($scope.currentCollection.fields) {
-			//if a connection has already been made, doesn't need to do it again
+		//if the collection is null, nothing is done and nothing is showed
+		if(!$scope.currentCollection) {
+			$scope.showFields = false;
 			return;
 		}
+		$scope.data = $scope.currentCollection.data;
+		
+		//not implemented yet
+		if($scope.collections.persistFieldValues == false)
+			$scope.clearFields();
+
+		//if a connection has already been made, doesn't need to do it again
+		if($scope.currentCollection.fields) {
+			$scope.showFields = true;
+			return;
+		}
+
 
 		var data = new FormData(); //define the parameters
 		data.append("collectionName", $scope.currentCollection.name);
 
-
 		var onloadCallback = function() {
-			$scope.currentCollection.fields = JSON.parse(this.responseText);
-			$scope.showFields = true;
+			try {
+				$scope.currentCollection.fields = JSON.parse(this.responseText);
+				$scope.showFields = true;
+			} catch(error) {
+				$scope.showFields = false;
+			}
 		};
 
 		executeConnection("POST", "php/ListFields.php", false, data, onloadCallback);
 	}
 
 	$scope.loadData = function() {
+		//@todo gif 
 		var data = new FormData();
 		data.append("collectionName", $scope.currentCollection.name);
 		data.append("fields", JSON.stringify($scope.currentCollection.fields));
@@ -76,9 +89,11 @@ var collectionController = function($scope){
 		//called when the load document was done
 		onloadCallback = function() {
 			try {
-				$scope.data = JSON.parse(this.responseText);
-			} catch(err) {
-				$scope.data = this.responseText;
+				$scope.currentCollection.data = JSON.parse(this.responseText);
+				$scope.data = $scope.currentCollection.data;
+				$scope.showLoading = false;
+			} catch(error) {
+				$scope.currentCollection.data = this.responseText;
 			}
 		};
 		executeConnection("POST", "php/ListData.php", false, data, onloadCallback);
@@ -125,6 +140,10 @@ var collectionController = function($scope){
 	$scope.typeOf = function(input) {
 	    return typeof input;
 	  }
+
+	$scope.toggle = function(data, key) {
+		data["show"+key] = data["show"+key] ? !data["show"+key] : true;
+	}
 
 };
 
