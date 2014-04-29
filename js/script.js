@@ -7,7 +7,7 @@ var collectionController = function($scope){
 	 * the controller is used the $outScope
 	 */
 		$outScope = $scope;
-		/*$scope.addData = function() {
+		$scope.addData = function() {
 			$scope.data = [];
 			$scope.data.push({nome:"dayman", idade:"18", a:"b"});
 			$scope.data.push({nome:"bru", idade:"19", nacionalidade:"brasil"});
@@ -37,7 +37,7 @@ var collectionController = function($scope){
 					campo1: "",
 					campo2: ""
 				}
-			};*/
+			};
 	//end the forced data bind ($outScope)
 	
 	var listCollectionsCallback = function() {
@@ -87,16 +87,37 @@ var collectionController = function($scope){
 		data.append("fields", JSON.stringify($scope.currentCollection.fields));
 
 		//called when the load document was done
+		
 		onloadCallback = function() {
 			try {
 				$scope.currentCollection.data = JSON.parse(this.responseText);
 				$scope.data = $scope.currentCollection.data;
 				$scope.showLoading = false;
 			} catch(error) {
-				$scope.currentCollection.data = this.responseText;
+				//$scope.currentCollection.data = this.responseText;
 			}
 		};
 		executeConnection("POST", "php/ListData.php", false, data, onloadCallback);
+	}
+	$scope.insertData = function() {
+		//@todo receive data as parameter
+
+		var data = new FormData();
+		data.append("collectionName", $scope.currentCollection.name);
+		data.append("data", JSON.stringify($scope.data));
+
+		onloadCallback = function() {
+			try {
+				//for now, this works!
+				//@todo show a popup with successs! (or not sucess)
+				$scope.currentCollection.data = JSON.parse(this.responseText);
+				$scope.data = $scope.currentCollection.data;
+				$scope.showLoading = false;
+			} catch(error) {
+				//@todo show (not sucess for some reason (you can inspect the code and find the error by yourself, if you want!))
+			}
+		};
+		executeConnection("POST", "php/InsertData.php", false, data, onloadCallback);
 	}
 
 	function executeConnection(type, url, sync, data, onload) {
