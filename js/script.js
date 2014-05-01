@@ -1,5 +1,46 @@
 var $outScope;
 
+var messages = {
+	"pt_BR": {
+		error_deleteData_alreadyDeleted: "O dado não existe mais (por favor, atualize seus dados).",
+		error_deleteData_cantDelete: "Não foi possível excluir o registro.",
+		message_confirmDelete: "Deseja realmente excluir?",
+		label_collections: "Coleções",
+		label_search: "Pesquisar",
+		label_addField: "Adicionar campo",
+		label_insertData: "Inserir registro",
+		label_deleteData: "Deletar",
+		label_showData: "Mostrar"
+	},
+	"en_US": {
+		error_deleteData_alreadyDeleted: "The data no longer exists (please update your data).",
+		error_deleteData_cantDelete: "Unable to delete the data",
+		message_confirmDelete: "Are you sure you want to delete?",
+		label_collections: "Collections",
+		label_search: "Search",
+		label_addField: "Add field",
+		label_insertData: "Insert data",
+		label_deleteData: "Delete",
+		label_showData: "Show"
+
+	},
+	"es_ES": {
+		error_deleteData_alreadyDeleted: "NON POSSIBLE!!",
+		error_deleteData_cantDelete: "Can't exclude this register.",
+		message_confirmDelete: "Deseja realmente excluir?",
+		label_collections: "Coleciones",
+		label_search: "Pesquisar",
+		label_addField: "Adicionar campo",
+		label_insertData: "Inserir registro",
+		label_deleteData: "Deletar",
+		label_showData: "Mostrar"
+
+	},
+
+};
+
+var lang = "pt_BR";
+
 var collectionController = function($scope){
 	/**
 	 * Only for debug and test where the mongoDB not work
@@ -7,7 +48,7 @@ var collectionController = function($scope){
 	 * the controller is used the $outScope
 	 */
 		$outScope = $scope;
-		$scope.addData = function() {
+		/*$scope.addData = function() {
 			$scope.data = [];
 			$scope.data.push({nome:"dayman", idade:"18", a:"b"});
 			$scope.data.push({nome:"bru", idade:"19", nacionalidade:"brasil"});
@@ -37,9 +78,17 @@ var collectionController = function($scope){
 					campo1: "",
 					campo2: ""
 				}
-			};
+			};*/
 	//end the forced data bind ($outScope)
-	
+
+	$scope.messages = messages;
+	$scope.lang = lang;
+
+	/* 
+		@TODO
+			ADD A "TYPE" FIELD IN FIELD
+				TO RESOLVE THE CAST PROBLEM (THE ACTUALLY SOLUTION WORKS MORE AND LESS, AND ITS UGLY!)
+	 */
 	var listCollectionsCallback = function() {
 		$scope.collections = JSON.parse(this.responseText);
 		//the response already come with "name" field (name of collection)
@@ -104,20 +153,53 @@ var collectionController = function($scope){
 
 		var data = new FormData();
 		data.append("collectionName", $scope.currentCollection.name);
-		data.append("data", JSON.stringify($scope.data));
+		data.append("data", JSON.stringify($scope.currentCollection.fields));
+
+		//resolve the reference copy problem
+		var copyObject = function(object) {
+			newobj = {};
+			for(key in object) {
+				newobj[key] = object[key];
+			}
+			return newobj;
+		}
 
 		onloadCallback = function() {
 			try {
-				//for now, this works!
 				//@todo show a popup with successs! (or not sucess)
-				$scope.currentCollection.data = JSON.parse(this.responseText);
-				$scope.data = $scope.currentCollection.data;
+				console.log(this.responseText);
+
+				if($scope.data == undefined) $scope.data = [];
+				$scope.data.push(copyObject($scope.currentCollection.fields));
+				$scope.clearFields();
+
 				$scope.showLoading = false;
 			} catch(error) {
 				//@todo show (not sucess for some reason (you can inspect the code and find the error by yourself, if you want!))
 			}
 		};
 		executeConnection("POST", "php/InsertData.php", false, data, onloadCallback);
+	}
+
+	$scope.deleteData = function(dataNumber) {
+		if(!confirm($scope.messages[$scope.lang]["message_confirmDelete"]))
+			return;
+
+		var data = new FormData();
+		data.append("collectionName", $scope.currentCollection.name);
+		data.append("data", JSON.stringify($scope.data[dataNumber]));
+
+		onloadCallback = function() {
+			try {
+				//for now, this works!
+				//@todo show a popup with successs! (or not sucess)
+				console.log(this.responseText);
+				$scope.data.splice(dataNumber, 1);
+			} catch(error) {
+				//@todo show (not sucess for some reason (you can inspect the code and find the error by yourself, if you want!))
+			}
+		};
+		executeConnection("POST", "php/DeleteData.php", false, data, onloadCallback);
 	}
 
 	function executeConnection(type, url, sync, data, onload) {

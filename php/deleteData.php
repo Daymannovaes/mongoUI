@@ -12,15 +12,18 @@ function connect($collectionName) {
 	$collection = $db->selectCollection($collectionName);
 	//echo "\ncollection count: ". $collection->count();
 
-	insertData($collection);
+	deleteData($collection);
 
 	$connection->close();
 }
 
-function insertData($collection) {
+function deleteData($collection) {
 	//echo "\nIniciando busca de campos\n";
 
 	$data = $_POST["data"] ? (array)json_decode($_POST["data"]) : "";
-	echo "insert result: ".$collection->insert($data);
+	unset($data["\$\$hashKey"]);
+
+	echo "delete result: ".$collection->remove($data, array("justOne" => true));
+	
 }
 ?>

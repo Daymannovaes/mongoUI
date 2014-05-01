@@ -1,7 +1,8 @@
 <!DOCTYPE HTML>
 <html> 
 <head>
-	<title>Mongo User Iterface</title>
+	<meta charset="UTF-8">
+	<title>Mongo User Interface</title>
 
 	<link href="css/bootstrap.css" rel="stylesheet">
 	<script type="text/javascript" src="js/angular.js"></script>
@@ -26,11 +27,11 @@
 				<div class="col-md-8"> 			
 					<select class="form-control" style="" data-ng-model="currentCollection"
 					data-ng-options="collection as collection.name for collection in collections" data-ng-change="loadFields()">
-						<option value="">Collections</option>
+						<option value="">{{messages[lang]['label_collections']}}</option>
 					</select>
 				</div>
 				<div class="col-md-4">
-					<input class="btn" type="button" data-ng-click="showCollections()" value="show collections" />
+					<input class="btn" type="button" data-ng-click="showCollections()" value="console.log" />
 				</div>
 			</div> <!-- end c -->
 
@@ -58,9 +59,9 @@
 					</div>
 
 					<!-- buttons -->
-					<input class="btn btn-primary" type="submit" data-ng-click="showLoading=true;loadData();" value="Pesquisar" />
-					<input class="btn" type="button" data-ng-click="showNewField = !showNewField" value="Adicionar campo" />
-					<input class="btn btn-success" type="button" data-ng-click="insertData()" value="Inserir registro" />
+					<input class="btn btn-primary" type="submit" data-ng-click="showLoading=true;loadData();" value={{messages[lang]['label_search']}} />
+					<input class="btn" type="button" data-ng-click="showNewField = !showNewField" value={{messages[lang]['label_addField']}} />
+					<input class="btn btn-success" type="button" data-ng-click="insertData()" value={{messages[lang]['label_insertData']}} />
 
 				</form>
 			</div> <!-- end field -->
@@ -94,10 +95,13 @@
 					<td data-ng-repeat="(key, data) in document">
 						<span data-ng-if="typeOf(data) != 'object' && typeOf(data) != 'boolean'">{{data}}</span>
 						<span data-ng-if="typeOf(data) == 'object' && typeOf(data) != 'boolean'">
-							<input type="button" class="btn btn-primary" data-ng-click="toggle(document, key)" value="Mostrar {{key}}"/>
+							<input type="button" class="btn btn-primary" data-ng-click="toggle(document, key)" value="{{messages[lang]['label_showData']}} {{key}}"/>
 							<div data-ng-show="document.show{{key}}" data-ng-include="'recursive-data-template.html'"><div>
 						</span>
 					</td>
+					<th>
+						<input class="btn btn-danger" type="button" data-ng-click="deleteData($index)" value={{messages[lang]['label_deleteData']}} />
+					</th>
 				</tr>
 			</table>
 		</div>
