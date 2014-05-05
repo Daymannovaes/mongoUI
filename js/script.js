@@ -6,22 +6,26 @@ var messages = {
 		error_deleteData_cantDelete: "Não foi possível excluir o registro.",
 		message_confirmDelete: "Deseja realmente excluir?",
 		label_collections: "Coleções",
+		label_languages: "Idioma",
 		label_search: "Pesquisar",
 		label_addField: "Adicionar campo",
 		label_insertData: "Inserir registro",
 		label_deleteData: "Deletar",
-		label_showData: "Mostrar"
+		label_showData: "Mostrar",
+		"test_message": "Essa é uma mensagem teste!",
 	},
 	"en_US": {
 		error_deleteData_alreadyDeleted: "The data no longer exists (please update your data).",
 		error_deleteData_cantDelete: "Unable to delete the data",
 		message_confirmDelete: "Are you sure you want to delete?",
 		label_collections: "Collections",
+		label_languages: "Language",
 		label_search: "Search",
 		label_addField: "Add field",
 		label_insertData: "Insert data",
 		label_deleteData: "Delete",
-		label_showData: "Show"
+		label_showData: "Show",
+		"test_message": "This is a text message!",
 
 	},
 	"es_ES": {
@@ -29,11 +33,13 @@ var messages = {
 		error_deleteData_cantDelete: "Can't exclude this register.",
 		message_confirmDelete: "Deseja realmente excluir?",
 		label_collections: "Coleciones",
+		label_languages: "Idioma",
 		label_search: "Pesquisar",
 		label_addField: "Adicionar campo",
 		label_insertData: "Inserir registro",
 		label_deleteData: "Deletar",
-		label_showData: "Mostrar"
+		label_showData: "Mostrar",
+		"test_message": "Se trata de un mensaje de texto!",
 
 	},
 
@@ -41,14 +47,14 @@ var messages = {
 
 var lang = "pt_BR";
 
-var collectionController = function($scope){
+var collectionController = function($scope, $http) {
 	/**
 	 * Only for debug and test where the mongoDB not work
 	 * like teknisa. So, to acess the intern methods of
 	 * the controller is used the $outScope
 	 */
 		$outScope = $scope;
-		/*$scope.addData = function() {
+		$scope.addData = function() {
 			$scope.data = [];
 			$scope.data.push({nome:"dayman", idade:"18", a:"b"});
 			$scope.data.push({nome:"bru", idade:"19", nacionalidade:"brasil"});
@@ -57,38 +63,41 @@ var collectionController = function($scope){
 
 		$scope.collections = [
 			{
-				name:"testCollection",
+				name:"pessoa",
 				fields: {
-					nome: "",
-					campo1: "",
-					campo2: ""
+					nome: {value:"", type:"string"},
+					idade: {value:"", type:"int"},
+					nacionalidade: {value:"", type:"string"}
 				}
 			},
 			{
 				name:"anotherCollection",
 				fields: {
-					firstField: ""
+					firstField: {value:"default", }
 				}
 			}
 		];
-		$scope.currentCollection = {
-				name:"testCollection",
-				fields: {
-					nome: "",
-					campo1: "",
-					campo2: ""
-				}
-			};*/
+		$scope.currentCollection = $scope.collections[0];
 	//end the forced data bind ($outScope)
 
 	$scope.messages = messages;
 	$scope.lang = lang;
+	$scope.languages = {
+		"pt_BR": "Português",
+		"en_US": "English",
+		"es_ES": "Español"
+	};
+	$scope.toggleLanguage = function(key) {
+		console.log(key);
+	}
 
 	/* 
 		@TODO
 			ADD A "TYPE" FIELD IN FIELD
 				TO RESOLVE THE CAST PROBLEM (THE ACTUALLY SOLUTION WORKS MORE AND LESS, AND ITS UGLY!)
 	 */
+
+// ---- CONNECTION methods ----- methods that connect with database -----------
 	var listCollectionsCallback = function() {
 		$scope.collections = JSON.parse(this.responseText);
 		//the response already come with "name" field (name of collection)
@@ -180,7 +189,6 @@ var collectionController = function($scope){
 		};
 		executeConnection("POST", "php/InsertData.php", false, data, onloadCallback);
 	}
-
 	$scope.deleteData = function(dataNumber) {
 		if(!confirm($scope.messages[$scope.lang]["message_confirmDelete"]))
 			return;
@@ -201,7 +209,10 @@ var collectionController = function($scope){
 		};
 		executeConnection("POST", "php/DeleteData.php", false, data, onloadCallback);
 	}
+// ---- END connection methods ------------------------------------------------
 
+
+// ---- UTILITY CONNECTION methods --------------------------------------------
 	function executeConnection(type, url, sync, data, onload) {
 		var http = defineXmlhttpByBrowser();
 
@@ -216,6 +227,8 @@ var collectionController = function($scope){
 		else
 			return new ActiveXObject("Microsoft.XMLHTTP");
 	}
+// ---- END utility connection methods ----------------------------------------
+
 
 	$scope.addField = function() {
 		$scope.showNewField = false; //hide the input

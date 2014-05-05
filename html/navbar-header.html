@@ -7,42 +7,25 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="#">Study Manager</a>
+        <a class="navbar-brand" href="#">Mongo User Interface</a>
     </div>
 
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="navbar-header-collapse">
         <ul class="nav navbar-nav">
-            <li class="" data-load="agenda">
-                <a href="#">Agenda</a>
-            </li>
-            <li class="active" data-load="subject">
-                <a href="#">Matérias</a>
-            </li>
-            <li class="" data-load="structure_tree">
-                <a href="#">Estrutura</a>
+            <li class="">
+                <a href="#">{{messages[lang]['test_message']}}</a>
             </li>
         </ul>
 
         <div class="row">
             <div class="col-sm-3 col-md-4 navbar-right">
+
                 <form class="navbar-form navbar-right" role="search">
 
-                    <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Pesquisar" data-ng-model="search">
-
-                        <div class="input-group-btn">
-                            <button type="submit" class="btn btn-default" data-toggle="dropdown"><span class="caret"></span></button>
-                            <ul class="dropdown-menu">
-                                <li><a href="#">Todos</a></li>
-                                <li class="divider"></li>
-                                <li><a href="#">Agenda</a></li>
-                                <li><a href="#">Matéria</a></li>
-                                <li><a href="#">Árvore</a></li>
-                            </ul>
-                            <button type="submit" class="btn btn-default">Pesquisar</button>
-                        </div><!-- /.input-group-btn -->
-                    </div><!-- /.input-group -->
+                    <select class="form-control" style="" data-ng-model="lang"
+                        data-ng-options="key as value for (key, value) in languages" data-ng-change="toggleLanguage(lang)">
+                        </select>
 
                 </form>
             </div><!-- /.col (form) -->
@@ -53,18 +36,3 @@
 </div><!-- /.container-fluid -->
 
 
-<script type="text/javascript">
-    function setToActive(nav_li) {
-        $("ul.nav > li").removeClass();
-        nav_li.addClass("active");
-    }
-
-    $("ul.nav > li").click(function() {
-        setToActive($(this));
-
-        //url define qual arquivo deve ser carregado no container
-        var url = $(this).attr("data-load");
-        url = "Frontend/html/" + url + ".html";
-        $("#container").removeClass().load(url);
-    });
-</script>

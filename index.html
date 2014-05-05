@@ -8,27 +8,32 @@
 	<script type="text/javascript" src="js/angular.js"></script>
 	<script type="text/javascript" src="js/script.js"></script>
 	<script type="text/javascript" src="js/jquery-1.11.0.min.js"></script>
-
-
 </head>
 <body data-ng-app>
-	<!-- top fixed nav bar -->
-	<nav data-ng-include="src='html/navbar-header.html'"
-	class=" navbar navbar-default navbar-fixed-top" role="navigation">
-		Loading navbar...
-	</nav>
-
 	<div data-ng-controller="collectionController" class="container" style="">
+		
+		<!-- top fixed nav bar -->
+		<nav data-ng-include="src='html/navbar-header.html'"
+		class=" navbar navbar-default navbar-fixed-top" role="navigation">
+			Loading navbar...
+		</nav>
+
 		<!-- Collections and fields -->
 		<div class="col-md-4" style="border:;">
 
 			<!-- Collections -->
 			<div class="row" style="border:;">
 				<div class="col-md-8"> 			
+					<!-- language -->
+		            <select class="form-control" style="" data-ng-model="lang"
+		            data-ng-options="key as value for (key, value) in languages">
+		            </select>
+		            	
 					<select class="form-control" style="" data-ng-model="currentCollection"
 					data-ng-options="collection as collection.name for collection in collections" data-ng-change="loadFields()">
 						<option value="">{{messages[lang]['label_collections']}}</option>
 					</select>
+
 				</div>
 				<div class="col-md-4">
 					<input class="btn" type="button" data-ng-click="showCollections()" value="console.log" />
@@ -40,7 +45,7 @@
 				<form data-ng-show="showFields">
 					<div class="form-group" data-ng-repeat="(key, value) in currentCollection.fields">
 						<label for={{key}}>{{key}}</label>
-						<input data-ng-model="currentCollection.fields[key]" class="form-control" type="text"
+						<input data-ng-model="currentCollection.fields[key].value" class="form-control" type="text"
 						placeholder={{currentCollection.name}}.{{key}}
 						name={{key}}
 						id="{{currentCollection.name}}_{{key}}" /> 
