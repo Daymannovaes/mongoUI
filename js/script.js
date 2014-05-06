@@ -11,6 +11,7 @@ var messages = {
 		label_addField: "Adicionar campo",
 		label_insertData: "Inserir registro",
 		label_deleteData: "Deletar",
+		label_changeData: "Alterar",
 		label_showData: "Mostrar",
 		"test_message": "Essa é uma mensagem teste!",
 	},
@@ -23,6 +24,7 @@ var messages = {
 		label_search: "Search",
 		label_addField: "Add field",
 		label_insertData: "Insert data",
+		label_changeData: "Change",
 		label_deleteData: "Delete",
 		label_showData: "Show",
 		"test_message": "This is a text message!",
@@ -38,6 +40,7 @@ var messages = {
 		label_addField: "Adicionar campo",
 		label_insertData: "Inserir registro",
 		label_deleteData: "Deletar",
+		label_changeData: "Alterar",
 		label_showData: "Mostrar",
 		"test_message": "Se trata de un mensaje de texto!",
 
@@ -81,7 +84,7 @@ var collectionController = function($scope, $http) {
 	//end the forced data bind ($outScope)
 
 	$scope.messages = messages;
-	$scope.lang = lang;
+	$scope.lang = {lang:lang}; //must be an object because the reference copy object (primitive doesn't work with ng include)
 	$scope.languages = {
 		"pt_BR": "Português",
 		"en_US": "English",
@@ -190,9 +193,12 @@ var collectionController = function($scope, $http) {
 		executeConnection("POST", "php/InsertData.php", false, data, onloadCallback);
 	}
 	$scope.deleteData = function(dataNumber) {
-		if(!confirm($scope.messages[$scope.lang]["message_confirmDelete"]))
-			return;
+		//if(!confirm($scope.messages[$scope.lang.lang]["message_confirmDelete"]))
+			//return;
 
+		console.log("data: ");
+		console.log($scope.data[dataNumber]);
+		return;
 		var data = new FormData();
 		data.append("collectionName", $scope.currentCollection.name);
 		data.append("data", JSON.stringify($scope.data[dataNumber]));
