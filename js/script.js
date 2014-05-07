@@ -61,7 +61,39 @@ var collectionController = function($scope, $http) {
 			$scope.data = [];
 			$scope.data.push({nome:"dayman", idade:"18", a:"b"});
 			$scope.data.push({nome:"bru", idade:"19", nacionalidade:"brasil"});
-			$scope.data.push({nome:"outro", orgaos:[{peso:"100g", nome:"coracao"},{peso:"1g", nome:"oi"}]});
+			$scope.data.push({nome:"outro", orgaos:[{peso:"100g", nome:["coracao"]},{peso:"1g", nome:"oi"}]});
+			$scope.data.push({nome:"BH",
+							 familias: [
+							 	{
+							 		nome: "Familia1",
+							 		quantidade: 2,
+							 		pessoas: [
+							 			{
+							 				nome:"day",
+							 				idade: 18
+							 			}, 
+							 			{
+							 				nome:"bru",
+							 				idade: 19
+							 			}
+							 		]
+							 	},
+							 	{
+							 		nome: "Familia2",
+							 		quantidade: 2,
+							 		pessoas: [
+							 			{
+							 				nome:"day",
+							 				idade: 18
+							 			}, 
+							 			{
+							 				nome:"bru",
+							 				idade: 19
+							 			}
+							 		]
+							 	}
+							 ]
+							});
 		}
 
 		$scope.collections = [
@@ -100,6 +132,19 @@ var collectionController = function($scope, $http) {
 				TO RESOLVE THE CAST PROBLEM (THE ACTUALLY SOLUTION WORKS MORE AND LESS, AND ITS UGLY!)
 	 */
 
+
+	 $scope.addParentProperty = function(data, parentName) {
+	 	if(parentName && data instanceof Array)
+	 		data["parentName"] = parentName;
+	 	
+	 	for(attr in data) {
+	 		if(typeof data[attr] == "object")
+	 			$scope.addParentProperty(data[attr], attr);
+	 	}
+	 }
+	 $scope.getParentByParentNameProperty = function(data, parentName) {
+
+	 }
 // ---- CONNECTION methods ----- methods that connect with database -----------
 	var listCollectionsCallback = function() {
 		$scope.collections = JSON.parse(this.responseText);

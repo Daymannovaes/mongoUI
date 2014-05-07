@@ -56,7 +56,7 @@ function castCriteria($criteria, $fields) {
 //if a field is empty, it is deleted from the criteria array
 function deleteEmptyFields($fields) {
 	foreach($fields as $key => $value) {
-		if($value == "")
+		if($value === "" && !isset($value))
 			unset($fields[$key]);
 	}
 	return $fields;

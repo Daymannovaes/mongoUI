@@ -81,6 +81,7 @@
 
 	<!-- recursive template for data show -->
 	<!-- @todo problem in ng-show (all ngshow after the first are showed) -->
+	<!-- @todo use twig -->
 	<script type="text/ng-template" id="recursive-data-template.html">
 		<span data-ng-if="typeOf(data) == 'string'">{{data}}</span>
 		<div data-ng-if="typeOf(data) != 'string'" data-ng-repeat="document in data">
