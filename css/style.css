@@ -1,0 +1,43 @@
+.container-blur {
+	-webkit-filter: blur(2px);
+
+	-webkit-transition: all 200ms;
+    /*
+    -moz-transition: all 200ms;
+    -o-transition: all 200ms;
+    -ms-transition: all 200ms;
+    transition: all 200ms;
+	
+	-moz-filter: blur(3px);
+	-o-filter: blur(3px);
+	-ms-filter: blur(3px);
+	filter: blur(3px);
+	*/
+}
+.container-focus {
+	-webkit-filter: blur(0px);
+
+	-webkit-transition: all 200ms;
+}
+
+div.popup {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	margin: -75px 0 0 -150px;
+	width: 300px;
+	height: 150px;
+	padding: 20px;
+	border: solid 1px #888;
+	background: #fff;
+	display: block;
+	opacity: 0;
+}
+div.popup-show {
+	opacity: 1;
+	-webkit-transition: all 400ms;
+}
+div.popup-hide {
+	opacity: 0;
+	-webkit-transition: all 400ms;
+}
