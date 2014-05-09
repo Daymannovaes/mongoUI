@@ -14,7 +14,7 @@
     <div class="collapse navbar-collapse" id="navbar-header-collapse">
         <ul class="nav navbar-nav">
             <li class="">
-                <a href="#">{{messages[lang.lang]['test_message']}}</a>
+                <a href="#">{{messages[messages.current]['test_message']}}</a>
             </li>
         </ul>
 
@@ -22,12 +22,11 @@
             <div class="navbar-right">
 
                 <form class="navbar-form navbar-middle" role="search">
-
-                    <select class="form-control" style="" data-ng-model="lang.lang"
-                        data-ng-options="key as value for (key, value) in languages" data-ng-change="toggleLanguage(lang)">
+                    <select class="form-control" style="" data-ng-model="messages.current"
+                        data-ng-options="key as value for (key, value) in languages">
                         </select>
 
-                </form>
+                </form> 
             </div><!-- /.col (form) -->
         </div><!-- /.row (form) -->
 

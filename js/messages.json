@@ -3,6 +3,7 @@
 		"error_deleteData_alreadyDeleted": "O dado não existe mais (por favor, atualize seus dados).",
 		"error_deleteData_cantDelete": "Não foi possível excluir o registro.",
 		"message_confirmDelete": "Deseja realmente excluir?",
+		"message_addData": "Digite o nome do campo",
 		"label_collections": "Coleções",
 		"label_languages": "Idioma",
 		"label_search": "Pesquisar",
@@ -10,12 +11,13 @@
 		"label_insertData": "Inserir registro",
 		"label_deleteData": "Deletar",
 		"label_showData": "Mostrar",
-		"test_message": "Essa é uma mensagem teste!",
+		"test_message": "Essa é uma mensagem teste!"
 	},
 	"en_US": {
 		"error_deleteData_alreadyDeleted": "The data no longer exists (please update your data).",
 		"error_deleteData_cantDelete": "Unable to delete the data",
 		"message_confirmDelete": "Are you sure you want to delete?",
+		"message_addData": "Type the field name",
 		"label_collections": "Collections",
 		"label_languages": "Language",
 		"label_search": "Search",
@@ -23,13 +25,14 @@
 		"label_insertData": "Insert data",
 		"label_deleteData": "Delete",
 		"label_showData": "Show",
-		"test_message": "This is a text message!",
+		"test_message": "This is a text message!"
 
 	},
 	"es_ES": {
 		"error_deleteData_alreadyDeleted": "NON POSSIBLE!!",
 		"error_deleteData_cantDelete": "Can't exclude this register.",
 		"message_confirmDelete": "Deseja realmente excluir?",
+		"message_addData": "Digite o nome do campo",
 		"label_collections": "Coleciones",
 		"label_languages": "Idioma",
 		"label_search": "Pesquisar",
@@ -37,8 +40,9 @@
 		"label_insertData": "Inserir registro",
 		"label_deleteData": "Deletar",
 		"label_showData": "Mostrar",
-		"test_message": "Se trata de un mensaje de texto!",
+		"test_message": "Se trata de un mensaje de texto!"
 
 	},
+	"current": "pt_BR"
 
-};
+}

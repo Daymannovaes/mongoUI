@@ -12,80 +12,92 @@
 	<script type="text/javascript" src="js/script-jquery.js"></script>
 </head>
 <body data-ng-app>
-	<div data-ng-controller="collectionController" class="container" style="">
-		
-		<!-- top fixed nav bar -->
-		<nav data-ng-include="src='html/navbar-header.html'"
-		class=" navbar navbar-default navbar-fixed-top" role="navigation">
-			Loading navbar...
-		</nav>
+	<div data-ng-controller="collectionController">
+		<div class="container" style="">
+			
+			<!-- top fixed nav bar -->
+			<nav data-ng-include="src='html/navbar-header.html'"
+			class=" navbar navbar-default navbar-fixed-top" role="navigation">
+				Loading navbar...
+			</nav>
 
-		<!-- Collections and fields -->
-		<div class="col-md-4" style="border:;">
+			<!-- Collections and fields -->
+			<div class="col-md-4" style="border:;">
 
-			<!-- Collections -->
-			<div class="row" style="border:;">
-				<div class="col-md-8 col-xs-8"> 	
-					<select class="form-control" style="" data-ng-model="currentCollection"
-					data-ng-options="collection as collection.name for collection in collections" data-ng-change="loadFields()">
-						<option value="">{{messages[lang.lang]['label_collections']}}</option>
-					</select>
+				<!-- Collections -->
+				<div class="row" style="border:;">
+					<div class="col-md-8 col-xs-8"> 	
+						<select class="form-control" style="" data-ng-model="currentCollection"
+						data-ng-options="collection as collection.name for collection in collections" data-ng-change="addData();connection.loadFields()">
+							<option value="">{{messages[messages.current]['label_collections']}}</option>
+						</select>
 
-				</div>
-
-				<div class="col-md-4 col-xs-4">
-					<input class="btn" type="button" data-ng-click="showCollections()" value="console.log" />
-				</div>
-			</div> <!-- end c -->
-
-			<!-- Fields -->
-			<div class="row" style="border:;">
-				<form data-ng-show="showFields">
-					<div class="form-group" data-ng-repeat="(key, value) in currentCollection.fields">
-						<label for={{key}}>{{key}}</label>
-						<input data-ng-model="currentCollection.fields[key]" class="form-control" type="text"
-						placeholder={{currentCollection.name}}.{{key}}
-						name={{key}}
-						id="{{currentCollection.name}}_{{key}}" /> 
 					</div>
 
-					<!-- new field -->    
-					<div class="form-group">
-						<div class="row" data-ng-show="showNewField">
-							<div class="col-md-10">
-								<input data-ng-model="newFieldName" class="form-control" type="text"/> 
-							</div>
-							<div class="col-md-2">
-								<input class="btn" type="button" value="+" data-ng-click="addField()" /> 
-							</div>
+					<div class="col-md-4 col-xs-4">
+						<input class="btn" type="button" data-ng-click="showCollections()" value="console.log" />
+					</div>
+				</div> <!-- end c -->
+
+				<!-- Fields -->
+				<div class="row" style="border:;">
+					<form data-ng-show="show.fields">
+						<div class="form-group" data-ng-repeat="(key, value) in currentCollection.fields">
+							<label for={{key}}>{{key}}</label>
+							<input data-ng-model="currentCollection.fields[key]" class="form-control" type="text"
+							placeholder={{currentCollection.name}}.{{key}}
+							name={{key}}
+							id="{{currentCollection.name}}_{{key}}" /> 
 						</div>
+
+						<!-- buttons -->
+						<input class="btn btn-primary" type="submit" data-ng-click="show.loading_datading=true;connection.loadData();" value={{messages[messages.current]['label_search']}} />
+						<input class="btn" type="button" data-ng-click="show.newField = true" onclick="blurAll()" value={{messages[messages.current]['label_addField']}} />
+						<input class="btn btn-success" type="button" data-ng-click="connection.insertData()" value={{messages[messages.current]['label_insertData']}} />
+
+					</form>
+				</div> <!-- end field -->
+			</div> <!-- end c and f -->
+
+
+			<!-- Data -->
+			<div class="col-md-8" style="border:;">
+				<div data-ng-include="src='recursive-data-template.html'"></div>
+			</div>
+
+			<!-- <div data-ng-show="show.loading_datading">
+				<div style="position:absolute;top:100px;left:100px;z-index:100;width:100px;height:100px;border:1px solid black;">Loading</div>
+			</div> -->
+		</div> <!-- End container scope -->
+
+		<!-- They are out of container scope to not be blur -->
+		<div class="popup">
+			<div class="row">				
+				<div style="text-align:center"><strong>{{messages[messages.current]['message_addData']}}</strong>
+					<span style="float: right">
+						<input class="btn btn-danger" type="button" value="&times;" data-ng-click="show.newField = " onclick="focusAll()" />
+					</span>
+				</div>
+			</div>
+			<!-- new field -->    
+			<div class="row" data-ng-show="show.newField">
+				<form>
+					<div class="col-md-10">
+						<input data-ng-model="newFieldName" class="form-control" type="text"/> 
 					</div>
-					<!-- buttons -->
-					<input class="btn btn-primary" type="submit" data-ng-click="showLoading=true;loadData();" value={{messages[lang.lang]['label_search']}} />
-					<input class="btn" type="button" data-ng-click="showNewField = !showNewField" value={{messages[lang.lang]['label_addField']}} />
-					<input class="btn btn-success" type="button" data-ng-click="insertData()" value={{messages[lang.lang]['label_insertData']}} />
-
+					<div class="col-md-2">
+						<input class="btn" type="submit" value="+" onclick="focusAll()" data-ng-click="field.add()" /> 
+					</div>
 				</form>
-			</div> <!-- end field -->
-		</div> <!-- end c and f -->
-
-
-		<!-- Data -->
-		<div class="col-md-8" style="border:;">
-			<div data-ng-include="src='recursive-data-template.html'"></div>
+			</div>
 		</div>
-
-		<!-- <div data-ng-show="showLoading">
-			<div style="position:absolute;top:100px;left:100px;z-index:100;width:100px;height:100px;border:1px solid black;">Loading</div>
-		</div> -->
-
 	</div> <!-- End controller scope -->
-	<div class="popup">This is a popup. The background is blur.</div>
-	<input type="button" class="button-blur" value="Show popup" onmouseover="blurAll()" onmouseout="focusAll()" />
 
 
 	<!-- recursive template for data show -->
-	<!-- @todo problem in ng-show (all ngshow after the first are showed) -->
+	<!-- @todo problem in ng-show (all ngshow after the first are showed) 
+			Do not add control properties in the iterated object 
+	-->
 	<!-- @todo use twig -->
 	<!-- @todo consider if is an array or object -->
 	<script type="text/ng-template" id="recursive-data-template.html">
@@ -96,7 +108,7 @@
 					<tr>
 						<th data-ng-repeat="(key, value) in document" data-ng-if="typeOf(data) != 'boolean'">
 							{{key}}
-							<input class="btn btn-success" type="button" data-ng-click="addParentProperty(data);deleteData($parent.$parent.$parent.document, $index)" value={{messages[lang.lang]['label_changeData']}} />
+							<input class="btn btn-success" type="button" data-ng-click="addParentProperty(data);deleteData($parent.$parent.$parent.document, $index)" value={{messages[messages.current]['label_changeData']}} />
 						</th>
 						<td>
 						</td>
@@ -106,12 +118,12 @@
 					<td data-ng-repeat="(key, data) in document">
 						<span data-ng-if="typeOf(data) != 'object' && typeOf(data) != 'boolean'">{{data}}</span>
 						<span data-ng-if="typeOf(data) == 'object' && typeOf(data) != 'boolean'">
-							<input type="button" class="btn btn-primary" data-ng-click="toggle(document, key)" value="{{messages[lang.lang]['label_showData']}} {{key}}"/>
+							<input type="button" class="btn btn-primary" data-ng-click="toggle(document, key)" value="{{messages[messages.current]['label_showData']}} {{key}}"/>
 							<div data-ng-show="document.show{{key}}" data-ng-include="'recursive-data-template.html'"><div>
 						</span>
 					</td>
 					<th>
-						<input class="btn btn-danger" type="button" data-ng-click="changeData($index)" value={{messages[lang.lang]['label_deleteData']}} />
+						<input class="btn btn-danger" type="button" data-ng-click="connection.changeData($index)" value={{messages[messages.current]['label_deleteData']}} />
 					</th>
 				</tr>
 			</table>
