@@ -26,8 +26,8 @@ function loadData($collection) {
 
 	$caster = $collection->findOne();
 	
-	$criteria = castCriteria($criteria, $caster);
 	$criteria = deleteEmptyFields($criteria);
+	$criteria = castCriteria($criteria, $caster);
 
 	$cursor = $collection->find($criteria);
 
@@ -47,7 +47,7 @@ function loadData($collection) {
 function castCriteria($criteria, $fields) {
 	foreach($fields as $key => $value) {
 		$type = gettype($value);
-		if($type == "double" || $type == "float" || $type == "int")
+		if(isset($criteria[$key]) && ($type == "double" || $type == "float" || $type == "int"))
 			$criteria[$key] = (double)$criteria[$key];
 	}
 	return $criteria;
@@ -56,7 +56,7 @@ function castCriteria($criteria, $fields) {
 //if a field is empty, it is deleted from the criteria array
 function deleteEmptyFields($fields) {
 	foreach($fields as $key => $value) {
-		if($value === "" && !isset($value))
+		if($value === "" || !isset($value))
 			unset($fields[$key]);
 	}
 	return $fields;

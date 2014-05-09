@@ -12,8 +12,13 @@
 	<script type="text/javascript" src="js/script-jquery.js"></script>
 </head>
 <body data-ng-app>
+	<!-- @todo
+		Create angular app
+		Create .class and .show properties in $scope, to separete the
+		Also separate all methods in $scope properties (field methods, data, show, class and etc)
+	-->
 	<div data-ng-controller="collectionController">
-		<div class="container" style="">
+		<div data-ng-class="class.container" data-ng-click="containerClosepopup()">
 			
 			<!-- top fixed nav bar -->
 			<nav data-ng-include="src='html/navbar-header.html'"
@@ -40,7 +45,7 @@
 				</div> <!-- end c -->
 
 				<!-- Fields -->
-				<div class="row" style="border:;">
+				<div class="row">
 					<form data-ng-show="show.fields">
 						<div class="form-group" data-ng-repeat="(key, value) in currentCollection.fields">
 							<label for={{key}}>{{key}}</label>
@@ -51,8 +56,8 @@
 						</div>
 
 						<!-- buttons -->
-						<input class="btn btn-primary" type="submit" data-ng-click="show.loading_datading=true;connection.loadData();" value={{messages[messages.current]['label_search']}} />
-						<input class="btn" type="button" data-ng-click="show.newField = true" onclick="blurAll()" value={{messages[messages.current]['label_addField']}} />
+						<input class="btn btn-primary" type="submit" data-ng-click="show.loading_data=true;connection.loadData();" value={{messages[messages.current]['label_search']}} />
+						<input class="btn" type="button" data-ng-click="show.newField = true; openPopup(); $event.stopPropagation();" value={{messages[messages.current]['label_addField']}} />
 						<input class="btn btn-success" type="button" data-ng-click="connection.insertData()" value={{messages[messages.current]['label_insertData']}} />
 
 					</form>
@@ -71,11 +76,11 @@
 		</div> <!-- End container scope -->
 
 		<!-- They are out of container scope to not be blur -->
-		<div class="popup">
+		<div data-ng-class="class.popup">
 			<div class="row">				
 				<div style="text-align:center"><strong>{{messages[messages.current]['message_addData']}}</strong>
 					<span style="float: right">
-						<input class="btn btn-danger" type="button" value="&times;" data-ng-click="show.newField = " onclick="focusAll()" />
+						<input class="btn btn-danger" type="button" value="&times;" data-ng-click="show.newField = false; closePopup()" />
 					</span>
 				</div>
 			</div>
@@ -86,7 +91,7 @@
 						<input data-ng-model="newFieldName" class="form-control" type="text"/> 
 					</div>
 					<div class="col-md-2">
-						<input class="btn" type="submit" value="+" onclick="focusAll()" data-ng-click="field.add()" /> 
+						<input class="btn" type="submit" value="+" data-ng-click="field.add(); closePopup()" /> 
 					</div>
 				</form>
 			</div>
@@ -108,7 +113,6 @@
 					<tr>
 						<th data-ng-repeat="(key, value) in document" data-ng-if="typeOf(data) != 'boolean'">
 							{{key}}
-							<input class="btn btn-success" type="button" data-ng-click="addParentProperty(data);deleteData($parent.$parent.$parent.document, $index)" value={{messages[messages.current]['label_changeData']}} />
 						</th>
 						<td>
 						</td>

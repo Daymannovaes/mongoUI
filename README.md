@@ -2,8 +2,10 @@ mongoUI
 =======
 
 ## A database interface with mongoDB.
+![Demo Screenshot](http://i.imgur.com/TsxemVz.png)
 
 ### It is already able to:
+
 * List collection names.
 * List collection fields.
 * List collection data.
@@ -11,12 +13,9 @@ mongoUI
 * Remove data.
 * Now have translated messages and labels!.
 
-@Todo
-=====
+## @Todo
 
-- Change collection data.
 - Resolve the cast type problem.
-- Improve translation system.
-- Add image here.
+- Change collection data.
 
 ###### Frontend.

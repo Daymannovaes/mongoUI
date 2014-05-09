@@ -1,10 +1,22 @@
 var $outScope;
 var collectionController = function($scope, $http) {
 
-// ---- CREATING $scope model -------------------------------------------------
+	$scope.consolelog = function(message) {
+		if($scope.debug)
+			console.log(message);
+	}
+// ---- CREATING $scope model -------------------------------------------------]
+
 	$scope.connection = {}; //functions
 	$scope.field = {}; //functions
-	$scope.show = {}; //show/hide flags
+	$scope.show = {}; //show and hide flags
+	$scope.debug = false;
+
+	$scope.class = {
+		container: ["container"],
+		popup: ["popup", "popup-hide"]
+	};
+
 	$scope.languages = {
 		"pt_BR": "Português",
 		"en_US": "English",
@@ -12,6 +24,7 @@ var collectionController = function($scope, $http) {
 	};
 
 
+	$scope.consolelog("\nGetting messages from the server.");
 	$http.get("js/messages.json").success(function(messages) {
 		$scope.messages = messages;
 	}).error(function(error) {
@@ -40,6 +53,8 @@ var collectionController = function($scope, $http) {
 	executeConnection("POST", "php/ListCollections.php", false, null, listCollectionsCallback);
 
 	$scope.connection.loadFields = function() {
+		$scope.consolelog("\n\nLoading Fields");
+
 		//if the collection is null, nothing is done and nothing is showed
 		if(!$scope.currentCollection) {
 			$scope.show.fields = false;
@@ -63,10 +78,15 @@ var collectionController = function($scope, $http) {
 
 		var onloadCallback = function() {
 			try {
+				$scope.consolelog("Parsing fields from the server.");
 				$scope.currentCollection.fields = JSON.parse(this.responseText);
 				$scope.show.fields = true;
+				$scope.consolelog("Parse successful");
 			} catch(error) {
 				$scope.show.fields = false;
+				$scope.consolelog("Error while parsing fields from the server.");
+				$scope.consolelog(this.responseText);
+				$scope.consolelog(error);
 			}
 		};
 
@@ -75,25 +95,31 @@ var collectionController = function($scope, $http) {
 
 	$scope.connection.loadData = function() {
 		//@todo gif 
+		$scope.consolelog("\n\nLoading data");
 		var data = new FormData();
 		data.append("collectionName", $scope.currentCollection.name);
 		data.append("fields", JSON.stringify($scope.currentCollection.fields));
 
-		//called when the load document was done
-		
 		onloadCallback = function() {
 			try {
+				$scope.consolelog("Parsing data from the server.");
 				$scope.currentCollection.data = JSON.parse(this.responseText);
+				$scope.consolelog("Parse successful");
+
 				$scope.data = $scope.currentCollection.data;
 				$scope.show.loading_data = false;
 			} catch(error) {
 				//$scope.currentCollection.data = this.responseText;
+				$scope.consolelog("Error while parsing data from the server.");
+				$scope.consolelog(this.responseText);
+				$scope.consolelog(error);
 			}
 		};
 		executeConnection("POST", "php/ListData.php", false, data, onloadCallback);
 	}
 	$scope.connection.insertData = function() {
 		//@todo receive data as parameter
+		$scope.consolelog("\n\nInserting data");
 
 		var data = new FormData();
 		data.append("collectionName", $scope.currentCollection.name);
@@ -125,6 +151,8 @@ var collectionController = function($scope, $http) {
 		executeConnection("POST", "php/InsertData.php", false, data, onloadCallback);
 	}
 	$scope.connection.deleteData = function(dataNumber) {
+		$scope.consolelog("\n\nDeleting data");
+
 		//if(!confirm($scope.messages[$scope.languages.current]["message_confirmDelete"]))
 			//return;
 
@@ -152,12 +180,16 @@ var collectionController = function($scope, $http) {
 
 // ---- UTILITY CONNECTION methods --------------------------------------------
 	function executeConnection(type, url, sync, data, onload) {
+		$scope.consolelog("\nConnecting at " + url);
+
 		var http = defineXmlhttpByBrowser();
 
 		http.onload = onload;
 
 		http.open(type, url, sync);
 		http.send(data);
+		$scope.consolelog("Connection done");
+
 	}
 	function defineXmlhttpByBrowser() {
 		if (window.XMLHttpRequest)
@@ -195,10 +227,26 @@ var collectionController = function($scope, $http) {
 	    return typeof input;
 	  }
 
+
 	$scope.toggle = function(data, key) {
+		$scope.consolelog(data);
 		data["show"+key] = data["show"+key] ? !data["show"+key] : true;
 	}
 
+	$scope.openPopup = function() {
+		$scope.class.container[1] = "container-blur";
+		$scope.class.popup[1] = "popup-show";
+	}
+	$scope.closePopup = function() {
+		$scope.class.container[1] = "container-focus";
+		$scope.class.popup[1] = "popup-hide";
+	}
+	$scope.containerClosepopup = function() {
+		if($scope.show.newField) {
+			$scope.closePopup();
+			$scope.show.newField = false;
+		}
+	}
 
 
 	 $scope.addParentProperty = function(data, parentName) {
@@ -222,7 +270,7 @@ var collectionController = function($scope, $http) {
 	 * the controller is used the $outScope
 	 */
 		$outScope = $scope;
-		$scope.addData = function() {
+		/*$scope.addData = function() {
 			$scope.data = [];
 			$scope.data.push({nome:"dayman", idade:"18", a:"b"});
 			$scope.data.push({nome:"bru", idade:"19", nacionalidade:"brasil"});
@@ -277,7 +325,7 @@ var collectionController = function($scope, $http) {
 				}
 			}
 		];
-		$scope.currentCollection = $scope.collections[0];
+		$scope.currentCollection = $scope.collections[0];*/
 	//end the forced data bind ($outScope)
 
 };
