@@ -48,6 +48,8 @@ class Connection {
     }
 
 }
+
+$connection = new Mongo();
 /*
 $con = new Connection(null, null, "a");
 

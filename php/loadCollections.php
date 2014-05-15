@@ -2,7 +2,7 @@
 
 require "Connection.php";
 
-class ListCollections {
+class LoadCollections {
 
 	private $connection;
 	private $collectionNames;
@@ -26,7 +26,7 @@ class ListCollections {
 	}
 }
 
-$listc = new ListCollections();
+$listc = new LoadCollections();
 $listc->buildResponse();
 $listc->closeConnection();
 

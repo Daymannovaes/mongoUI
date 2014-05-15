@@ -10,6 +10,7 @@
 		"label_addField": "Adicionar campo",
 		"label_insertData": "Inserir registro",
 		"label_deleteData": "Deletar",
+		"label_changeData": "Alterar",
 		"label_showData": "Mostrar",
 		"test_message": "Essa é uma mensagem teste!"
 	},
@@ -24,6 +25,7 @@
 		"label_addField": "Add field",
 		"label_insertData": "Insert data",
 		"label_deleteData": "Delete",
+		"label_changeData": "Update",
 		"label_showData": "Show",
 		"test_message": "This is a text message!"
 
@@ -39,6 +41,7 @@
 		"label_addField": "Adicionar campo",
 		"label_insertData": "Inserir registro",
 		"label_deleteData": "Deletar",
+		"label_changeData": "Cambiar",
 		"label_showData": "Mostrar",
 		"test_message": "Se trata de un mensaje de texto!"
 
