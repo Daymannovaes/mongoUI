@@ -18,4 +18,4 @@ mongoUI
 - Resolve the cast type problem.
 - Change collection data.
 
-###### Frontend.
+###### Running MongoDB at v2.4.9 and AngularJS at v1.2.13
