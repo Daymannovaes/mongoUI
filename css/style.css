@@ -91,3 +91,10 @@ div.popup-hide {
 	background-color: blue;
 	
 }
+
+li {
+   list-style: none;
+}
+.recursive-template {
+   border-left: 1px dashed #777;
+}

@@ -20,6 +20,7 @@ var mongoApp = angular.module('mongoApp', [])
 	}
 	$scope.show = {}; //show and hide flags
 	$scope.debug = true;
+	$scope.connection.connect = false;
 
 	$scope.class = {
 		container: ["container"],
@@ -36,7 +37,7 @@ var mongoApp = angular.module('mongoApp', [])
 
 
 	$scope.consolelog("\nGetting messages from the server.");
-	$http.get("js/messages.json").success(function(messages) {
+	$http.get("json/messages.json").success(function(messages) {
 		$scope.messages = messages;
 		$scope.consolelog("Get messages successful.");
 	}).error(function(error) {
@@ -61,6 +62,12 @@ var mongoApp = angular.module('mongoApp', [])
 			CLOSE POPUP WITH ESC KEY
 
 			REFACTOR THE NAME OF VARIABLES, FIELD AND COLUMN ARE THE SAME THING, LIST AND LOAD TOO
+
+			ADD SOME GOOD JAVASCRIPT PATTERN TO CREATE PRIVATE METHOD THAT ONLY ARE ACCESSED BY THE PUBLICS
+				CONNECTION METHODS ARE PUBLIC
+				SHOW LOADING AND CLEAR LOADING ARE PRIVATE
+
+			CHANGE $SCOPE.NEWFIELDNAME
 	 */
 
 
@@ -78,17 +85,22 @@ var mongoApp = angular.module('mongoApp', [])
 	
 // ----------------------------------------------------------------------------------------------------------
 // ---- CONNECTION methods ----- methods that connect with database -----------
-	$scope.consolelog("Getting collection names from the server");
-	$scope.show.showLoading();
-	$http.get("php/loadCollections.php").success(function(collections) {
-		$scope.collections = collections;
-		$scope.show.clearLoading()
+	$scope.connection.loadCollections = function() {
+			return;
+		$scope.consolelog("Getting collection names from the server");
+		$scope.show.showLoading();
 
-		$scope.consolelog("Get collection names successful.");
-	}).error(function(error) {
-		console.log("Error while getting collection names from the server.");
-		console.log(error);
-	});
+		$http.get("php/loadCollections.php").success(function(collections) {
+			$scope.show.clearLoading();
+			$scope.collections = collections;
+
+			$scope.consolelog("Get collection names successful.");
+		}).error(function(error) {
+			console.log("Error while getting collection names from the server.");
+			console.log(error);
+		});
+	}
+	$scope.connection.loadCollections();
 
 	$scope.connection.loadFields = function() {
 		$scope.consolelog("\n\nLoading Fields");
@@ -116,6 +128,7 @@ var mongoApp = angular.module('mongoApp', [])
 			return;
 		}
 
+		if(!$scope.connection.connect) return;
 		$http.post("php/loadFields.php", {"collectionName": $scope.currentCollection.name})
 			.success(function(response) {
 				$scope.currentCollection.fields = response;
@@ -133,7 +146,8 @@ var mongoApp = angular.module('mongoApp', [])
 	$scope.connection.loadData = function() {
 		$scope.consolelog("\n\nLoading data");
 
-		$scope.show.data = false; //first hide the old fields
+		$scope.show.data = true; //first hide the old fields
+		if(!$scope.connection.connect) return;
 		$scope.show.showLoading("Loading data");
 
 		var data = {
@@ -174,13 +188,14 @@ var mongoApp = angular.module('mongoApp', [])
 			return newobj;
 		}
 
+		if($scope.data == undefined) $scope.data = [];
+		$scope.data.push(($scope.currentCollection.fields));
+
+		if(!$scope.connection.connect) return;
 		$http.post("php/insertData.php", data)
 			.success(function(response) {
 				//@todo show a popup with successs! (or not sucess)
-				console.log(this.responseText);
-
-				if($scope.data == undefined) $scope.data = [];
-				$scope.data.push(($scope.currentCollection.fields));
+				console.log(response);
 				$scope.field.clear();
 
 				$scope.show.loading_data = false;
@@ -219,13 +234,14 @@ var mongoApp = angular.module('mongoApp', [])
 
 	$scope.connection.changeData = function(data) {
 		console.log(data);
+		return;
 		data["nome"] = "deu certo";
 	}
 // ---- END connection methods ------------------------------------------------
 	$scope.field.add = function() {
 		$scope.show.newField = false; //hide the input
 
-		$scope.currentCollection.fields[$scope.newFieldName] = ""; //actual add of the field
+		$scope.currentCollection.fields[$scope.newFieldName] = {value: "", type:"string"}; //actual add of the field
 		$scope.newFieldName = ""; //clear the field input
 	}
 
@@ -245,10 +261,18 @@ var mongoApp = angular.module('mongoApp', [])
 	}	
 
 	//used in recursive template (show data)
-	$scope.typeOf = function(input) {
-	    return typeof input;
-	  }
-
+		$scope.typeOf = function(input) {
+		    return typeof input;
+		}
+		$scope.isArray = function(input) {
+			return input instanceof Array;
+		}
+		$scope.isObjectAndNotArray = function(input) {
+			return (typeof input == "object") && !(input instanceof Array);
+		}
+		$scope.isNumber = function(input) {
+			return !isNaN(parseInt(input));
+		}
 
 	$scope.toggle = function(data, key) {
 		$scope.consolelog(data);
@@ -294,13 +318,12 @@ var mongoApp = angular.module('mongoApp', [])
 	 * the controller is used the $outScope
 	 */
 		$outScope = $scope;
-		/*$scope.addData = function() {
-			$scope.data = [];
+		$scope.addData = function() {
+			$scope.data = [];/*
 			$scope.data.push({nome:"dayman", idade:"18", a:"b"});
 			$scope.data.push({nome:"bru", idade:"19", nacionalidade:"brasil"});
-			$scope.data.push({nome:"outro", orgaos:[{peso:"100g", nome:["coracao"]},{peso:"1g", nome:"oi"}]});
-			$scope.data.push({nome:"BH",
-							 familias: [
+			$scope.data.push({nome:"outro", orgaos:[{peso:"100g", nome:["coracao"]},{peso:"1g", nome:"oi"}]});*/
+			$scope.data.push({familias: [
 							 	{
 							 		nome: "Familia1",
 							 		quantidade: 2,
@@ -329,7 +352,8 @@ var mongoApp = angular.module('mongoApp', [])
 							 			}
 							 		]
 							 	}
-							 ]
+							 ],
+							nome:"BH"
 							});
 		}
 
@@ -349,7 +373,7 @@ var mongoApp = angular.module('mongoApp', [])
 				}
 			}
 		];
-		$scope.currentCollection = $scope.collections[0];*/
+		$scope.currentCollection = $scope.collections[0];
 	//end the forced data bind ($outScope)
 
 });

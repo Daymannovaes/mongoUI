@@ -17,6 +17,14 @@
 		Also separate all methods in $scope properties (field methods, data, show, class and etc)
 	-->
 	<div data-ng-controller="collectionController">
+
+		<!-- Loading -->
+		<div class="loading" data-ng-show="show.loading">
+			<div class="loading-content">
+				<img id="loading-image" src="images/loading.gif" alt="Loading..." />{{label_loading}}
+			</div>
+		</div>
+		
 		<div data-ng-class="class.container" data-ng-click="containerClosepopup()">
 			
 			<!-- top fixed nav bar -->
@@ -57,7 +65,7 @@
 
 						<!-- buttons -->
 						<input class="btn btn-primary" type="submit"
-							data-ng-click="connection.loadData()"
+							data-ng-click="addData()"
 							value={{messages[messages.current]['label_search']}} />
 
 						<input class="btn btn-default" type="button"
@@ -75,7 +83,11 @@
 
 			<!-- Data -->
 			<div class="col-md-8" style="border:;" data-ng-show="show.data">
-				<div data-ng-include="src='recursive-data-template.html'"></div>
+				<ul>
+					<li data-ng-repeat="value in data">
+						<div data-ng-include="src='recursive-data-template.html'"></div>
+					</li>
+				</ul>
 			</div>
 		</div> <!-- End container scope -->
 
@@ -99,19 +111,17 @@
 					</div>
 				</div>
 				<div class="col-md-12">
-					<select>
+					<select class="form-control">
 						<option>Numeric</option>
+						<option>String</option>
+						<option>Boolean</option>
+						<option>Object</option>
+						<option>Array</option>
 					</select> 
 				</div>
 			</form>
 		</div>
 
-		<!-- Loading -->
-		<div class="loading" data-ng-show="show.loading">
-			<div class="loading-content">
-				<img id="loading-image" src="images/loading.gif" alt="Loading..." />{{label_loading}}
-			</div>
-		</div>
 	</div> <!-- End controller scope -->
 
 
@@ -122,6 +132,28 @@
 	<!-- @todo use twig -->
 	<!-- @todo consider if is an array or object -->
 	<script type="text/ng-template" id="recursive-data-template.html">
+		<ul class="recursive-template">
+			<li data-ng-repeat="(key, value) in value">
+				<span data-ng-if="!isNumber(key)"> 
+					{{key}}
+				</span>
+				<span data-ng-if="typeOf(value) != 'object'">
+				: {{value}}
+				</span>
+				<span data-ng-if="isArray(value)">
+					: [
+					<div data-ng-include="src='recursive-data-template.html'"></div>
+					]
+				</span>
+				<span data-ng-if="isObjectAndNotArray(value)">
+					{
+					<div data-ng-include="src='recursive-data-template.html'"></div>
+					}
+				</span>
+			</li>
+		</ul>
+	</script>
+	<script type="text/ng-template" id="_recursive-data-template.html">
 		<span data-ng-if="typeOf(data) == 'string'">{{data}}</span>
 		<div data-ng-if="typeOf(data) != 'string'" data-ng-repeat="document in data">
 			<table class="table table-striped table-hover">
@@ -131,7 +163,7 @@
 							{{key}}
 						</th>
 						<td style="text-align:right">
-							<input class="btn btn-warning" type="button" data-ng-click="connection.changeData(document)" value={{messages[messages.current]['label_changeData']}} />
+							<input class="btn btn-warning" type="button" data-ng-click="connection.changeData($parent)" value={{messages[messages.current]['label_changeData']}} />
 						</td>
 					</tr>
 				</thead>						

@@ -1,7 +1,6 @@
 <?php 
 
 require "Connection.php";
-
 class LoadCollections {
 
 	private $connection;
