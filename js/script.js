@@ -1,5 +1,6 @@
 var $outScope;
 
+
 var mongoApp = angular.module('mongoApp', [])
 .controller("collectionController", function($scope, $http){
 
@@ -13,14 +14,16 @@ var mongoApp = angular.module('mongoApp', [])
 	$scope.connection = {}; //functions
 	$scope.field = {}; //functions
 	$scope.field.type = {
-		"string": "string",
+		"text": "text",
+		"string": "text",
+		"number": "number",
 		"double": "number",
 		"float": "number",
-		"int": "number"
-	}
+		"int": "number",
+	};
 	$scope.show = {}; //show and hide flags
 	$scope.debug = true;
-	$scope.connection.connect = false;
+	$scope.connection.connect = true;
 
 	$scope.class = {
 		container: ["container"],
@@ -48,26 +51,12 @@ var mongoApp = angular.module('mongoApp', [])
 
 	/* 
 		@TODO
-			ADD A "TYPE" FIELD IN FIELD
-				TO RESOLVE THE CAST PROBLEM (THE ACTUALLY SOLUTION WORKS MORE AND LESS, AND ITS UGLY!)
-					type field added
-			
-			REFACTOR JSON MESSAGES
+		
+			REFACTOR NEW.FIELD OBJECT
 
-			CREATE AUTO TEST WITH SELENIUM AND XDEBUGGER CODE COVERAGE
+			ADD NEW FIELD IN THE END
 
-			FIRST, ADD SINGLETON CONNECTION TO INSTANTIATE ONLY A ONE CONNECTION (AND CLOSE IN FINISH WINDOW)
-			SECOND, ADD AN SINGLETON BY USER (DEFINIED BY AN ID, FOR EXAMPLE)
-
-			CLOSE POPUP WITH ESC KEY
-
-			REFACTOR THE NAME OF VARIABLES, FIELD AND COLUMN ARE THE SAME THING, LIST AND LOAD TOO
-
-			ADD SOME GOOD JAVASCRIPT PATTERN TO CREATE PRIVATE METHOD THAT ONLY ARE ACCESSED BY THE PUBLICS
-				CONNECTION METHODS ARE PUBLIC
-				SHOW LOADING AND CLEAR LOADING ARE PRIVATE
-
-			CHANGE $SCOPE.NEWFIELDNAME
+			STORE DELETE AND UPDATE ACTIONS IN SOMEWHERE TO COMMIT (IN DATA BASE) AFTER
 	 */
 
 
@@ -83,16 +72,21 @@ var mongoApp = angular.module('mongoApp', [])
 	}
 
 	
-// ----------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
+
+// --------------------------------------------------------------------------------------------------------------------
+
 // ---- CONNECTION methods ----- methods that connect with database -----------
 	$scope.connection.loadCollections = function() {
-			return;
 		$scope.consolelog("Getting collection names from the server");
 		$scope.show.showLoading();
 
 		$http.get("php/loadCollections.php").success(function(collections) {
 			$scope.show.clearLoading();
 			$scope.collections = collections;
+
+			//set focus to selection after 10 mili seconds
+			setTimeout(function() {$("select[data-ng-model='currentCollection']").focus()}, 10);
 
 			$scope.consolelog("Get collection names successful.");
 		}).error(function(error) {
@@ -135,6 +129,9 @@ var mongoApp = angular.module('mongoApp', [])
 				$scope.show.fields = true;
 				$scope.show.clearLoading();
 
+				//focus first field after 10 milisseconds
+				setTimeout(function() {$("form#form_fields input:first").focus()}, 100);
+
 				$scope.consolelog("Load fields successful");
 			}).error(function(error) {
 				$scope.consolelog("Error while loading fields from server.");
@@ -158,16 +155,15 @@ var mongoApp = angular.module('mongoApp', [])
 		$http.post("php/loadData.php", data)
 			.success(function(response) {
 				$scope.currentCollection.data = response;
-				$scope.data = $scope.currentCollection.data;
 
 				$scope.show.clearLoading();
 				$scope.show.data = true;
 
+				console.log(response);
 				$scope.consolelog("Load data successful");
 			}).error(function(error) {
 				$scope.consolelog("Error while loading data from server.");
 				console.log(error);
-				console.log(response);
 			});
 		//executeConnection("POST", "php/ListData.php", false, data, onloadCallback);
 	}
@@ -176,21 +172,20 @@ var mongoApp = angular.module('mongoApp', [])
 		$scope.consolelog("\n\nInserting data");
 
 		var data = new FormData();
-		data.append("collectionName", $scope.currentCollection.name);
-		data.append("data", JSON.stringify($scope.currentCollection.fields));
 
-		//resolve the reference copy problem
-		var copyObject = function(object) {
-			newobj = {};
-			for(key in object) {
-				newobj[key] = object[key];
-			}
-			return newobj;
-		}
+		var data = {
+			collectionName: $scope.currentCollection.name,
+			fields: $scope.currentCollection.fields
+		};
 
-		if($scope.data == undefined) $scope.data = [];
-		$scope.data.push(($scope.currentCollection.fields));
-
+		if($scope.currentCollection.data == undefined) $scope.currentCollection.data = [];
+		obj = {};
+		for(key in $outScope.currentCollection.fields)
+			obj[key] = $outScope.currentCollection.fields[key]["value"];
+		$scope.currentCollection.data.push(obj);
+		$scope.show.data = true;
+		$scope.field.clear();
+		return;
 		if(!$scope.connection.connect) return;
 		$http.post("php/insertData.php", data)
 			.success(function(response) {
@@ -209,46 +204,130 @@ var mongoApp = angular.module('mongoApp', [])
 	$scope.connection.deleteData = function(dataNumber) {
 		$scope.consolelog("\n\nDeleting data");
 
-		//if(!confirm($scope.messages[$scope.languages.current]["message_confirmDelete"]))
-			//return;
+		if(!confirm($scope.messages[$scope.messages.current]["message_confirmDelete"])) {
+			$scope.consolelog("Delete canceled");
+			return;
+		}
+		$scope.show.showLoading("Deleting data");
 
 		console.log("data: ");
-		console.log($scope.data[dataNumber]);
-		return;
-		var data = new FormData();
-		data.append("collectionName", $scope.currentCollection.name);
-		data.append("data", JSON.stringify($scope.data[dataNumber]));
+		console.log($scope.currentCollection.data[dataNumber]);
 
-		onloadCallback = function() {
-			try {
+		var data = {
+			collectionName: $scope.currentCollection.name,
+			data: $scope.currentCollection.data[dataNumber]
+		};
+
+		$http.post("php/deleteData.php", data)
+			.success(function(response) {
 				//for now, this works!
 				//@todo show a popup with successs! (or not sucess)
-				console.log(this.responseText);
-				$scope.data.splice(dataNumber, 1);
-			} catch(error) {
-				//@todo show (not sucess for some reason (you can inspect the code and find the error by yourself, if you want!))
-			}
-		};
-		executeConnection("POST", "php/deleteData.php", false, data, onloadCallback);
+				console.log(response);
+				//@todo fade out
+				$scope.currentCollection.data.splice(dataNumber, 1);	
+				$scope.show.clearLoading();			
+			}).error(function(error) {
+				$scope.consolelog("Error while deleting data in server.");
+				console.log(error);
+				console.log(response);				
+			});
 	}
 
 	$scope.connection.changeData = function(data) {
 		console.log(data);
-		return;
-		data["nome"] = "deu certo";
+		if(confirm("Update data is not working yet"))
+			data["nome"] = "deu certo";
+	}
+	$scope.connection.commitActions = function(data) {
+		window.alert("Commit is not working yet");
 	}
 // ---- END connection methods ------------------------------------------------
-	$scope.field.add = function() {
-		$scope.show.newField = false; //hide the input
+	
 
-		$scope.currentCollection.fields[$scope.newFieldName] = {value: "", type:"string"}; //actual add of the field
-		$scope.newFieldName = ""; //clear the field input
+// --------------------------------------------------------------------------------------------------------------------
+
+// --------------------------------------------------------------------------------------------------------------------
+
+// ---- NEW FIELD methods -----------------------------------------------------
+	$scope.field.add = function() {
+		$scope.currentCollection.fields[$scope.field.new.name] = {
+			value: "",
+			type:$scope.field.new.type
+		}; //actual add of the field
+
+		//clear field and selection
+		$scope.field.new.name = "";
+		$scope.field.new.type = "";
 	}
 
 	$scope.field.clear = function() {
 		for(key in $scope.currentCollection.fields)
-			$scope.currentCollection.fields[key] = "";
+			$scope.currentCollection.fields[key]["value"] = "";
 	}
+
+	
+	$scope.field.template = {
+		name: "",
+		type: "text",
+		value: ""
+	}
+	$scope.field.new = angular.copy($scope.field.template);
+
+	$scope.field.updateTemplate = function(field) {
+		console.log(field);
+		if(field.type == "object") {
+			field.value = [];
+			field.value.push(angular.copy($scope.field.template));
+			field.showAddChild = true;
+		}
+		else {
+			field.value = "";
+			field.showNew = true;
+		}
+		console.log(field);
+	}
+	$scope.field.addChild = function(field) {
+		field.value.push(angular.copy($scope.field.template));
+	}
+	$scope.field.selfDelete = function(field, fieldNumber) {
+
+
+		realParent = field.$parent.$parent.$parent.$parent.value ?
+						field.$parent.$parent.$parent.$parent.value.value :
+						field.$parent.$parent.$parent.field.new.value;
+
+		if(realParent.length > 1) {
+			realParent.splice(fieldNumber, 1);
+			delete field;
+		}
+	}
+
+	// ---- POPUP VISIBILITY methods ------------------------------------------
+	$scope.openPopup = function() {
+		$scope.show.newField = true;
+
+		$scope.class.container[1] = "container-blur";
+		$scope.class.popup[1] = "popup-show";
+
+		//set focus to the field ten milisseconds after, because of the delay to show popup
+		setTimeout(function(){$(".popup-show input[type='text']").focus()}, 10);
+	}
+	$scope.closePopup = function(event) {
+		if(!event || event.which == 27) {
+			$scope.class.container[1] = "container-focus";
+			$scope.class.popup[1] = "popup-hide";
+			$scope.field.new = angular.copy($scope.field.template); //clear properties
+
+			$scope.show.newField = false;
+		}
+	}
+	$scope.containerClosepopup = function() {
+		if($scope.show.newField)
+			$scope.closePopup();
+	}	
+// ---- END new field methods ------------------------------------------------
+
+
 
 	//only console.log
 	$scope.showCollections = function() {
@@ -279,22 +358,7 @@ var mongoApp = angular.module('mongoApp', [])
 		data["show"+key] = data["show"+key] ? !data["show"+key] : true;
 	}
 
-	$scope.openPopup = function() {
-		$scope.class.container[1] = "container-blur";
-		$scope.class.popup[1] = "popup-show";
 
-		$(".popup-show input[type='text']").click();
-	}
-	$scope.closePopup = function() {
-		$scope.class.container[1] = "container-focus";
-		$scope.class.popup[1] = "popup-hide";
-	}
-	$scope.containerClosepopup = function() {
-		if($scope.show.newField) {
-			$scope.closePopup();
-			$scope.show.newField = false;
-		}
-	}
 
 
 	 $scope.addParentProperty = function(data, parentName) {
@@ -318,11 +382,11 @@ var mongoApp = angular.module('mongoApp', [])
 	 * the controller is used the $outScope
 	 */
 		$outScope = $scope;
-		$scope.addData = function() {
-			$scope.data = [];/*
+		/*$scope.addData = function() {
+			$scope.data = [];
 			$scope.data.push({nome:"dayman", idade:"18", a:"b"});
 			$scope.data.push({nome:"bru", idade:"19", nacionalidade:"brasil"});
-			$scope.data.push({nome:"outro", orgaos:[{peso:"100g", nome:["coracao"]},{peso:"1g", nome:"oi"}]});*/
+			$scope.data.push({nome:"outro", orgaos:[{peso:"100g", nome:["coracao"]},{peso:"1g", nome:"oi"}]});
 			$scope.data.push({familias: [
 							 	{
 							 		nome: "Familia1",
@@ -373,7 +437,7 @@ var mongoApp = angular.module('mongoApp', [])
 				}
 			}
 		];
-		$scope.currentCollection = $scope.collections[0];
+		$scope.currentCollection = $scope.collections[0];*/
 	//end the forced data bind ($outScope)
 
 });

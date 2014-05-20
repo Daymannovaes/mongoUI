@@ -102,6 +102,7 @@ function deleteEmptyFields($fields) {
 }
 function deleteTypeFields($fields) {
 	foreach($fields as $key => $value) {
+		// $fields[$key] = $fields[$value]
 		unset($fields[$key]["type"]);
 	}
 	return $fields;

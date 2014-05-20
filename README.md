@@ -11,11 +11,6 @@ mongoUI
 * List collection data.
 * Insert data.
 * Remove data.
-* Now have translated messages and labels!.
-
-## @Todo
-
-- Resolve the cast type problem.
-- Change collection data.
+* Translated messages and labels!.
 
 ###### Running MongoDB at v2.4.9 and AngularJS at v1.2.13

@@ -22,12 +22,19 @@
 
 div.popup {
 	position: fixed;
-	top: 50%;
-	left: 50%;
-	margin: -75px 0 0 -150px;
-	width: 300px;
-	height: 150px;
+	top: 10%;
+	right: -10%;
+	/*margin: -75px 0 0 -150px;*/
+	z-index: 100;
+
+	height: 80%;
+	width: 80%;	
+
+	box-shadow: -5px 5px 10px -5px;
+
 	padding: 20px;
+	padding-right: 15%;
+	padding-left: 15%;
 	border: solid 1px #888;
 	background: #fff;
 	display: block;
@@ -92,9 +99,24 @@ div.popup-hide {
 	
 }
 
+.template-data > li {
+	border-bottom: 1px dashed #777;
+}
 li {
    list-style: none;
 }
+li div.btn-group, div.btn-group-vertical {
+	position: absolute;
+	right: 1%;
+}
 .recursive-template {
    border-left: 1px dashed #777;
+}
+
+.notation {
+	font-size: 20px;
+	color: #666;
+}
+
+.new-field.popup {
 }
