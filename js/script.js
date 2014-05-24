@@ -1,4 +1,14 @@
-var updateParallax = function() {
+window.onload = function() {
+	updateParallaxHeight();
+	updateModalHeight();
+	setItemInDropdownAsSelected();
+}
+window.onresize = function() {
+	updateParallaxHeight();
+	updateModalHeight();
+}
+
+var updateParallaxHeight = function() {
 	$("#parallax-1").css("height", window.innerHeight);
 
 	$("#parallax-2").css("top", window.innerHeight);
@@ -8,10 +18,10 @@ var updateParallax = function() {
 
 	$("#parallax-2").css("padding-top", navbarHeight);
 }
-
-window.onresize = function() {
-	updateParallax();
+var updateModalHeight = function() {
+	$("#newField .modal-content").css("min-height", window.innerHeight*0.8);
 }
+
 
 var scrollToTop = function() {
 	var scrollInterval = setInterval(function() {
@@ -23,6 +33,9 @@ var scrollToTop = function() {
 
 
 
-window.onload = function() {
-	updateParallax();
+var setItemInDropdownAsSelected = function() {
+	$("div#newField ul.dropdown-menu li").click(function() {
+		$(this).css("background-color", "#ddd");
+		$("div#newField ul.dropdown-menu li").not(this).css("background-color", "#fff");
+	});	
 }

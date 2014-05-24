@@ -10,6 +10,7 @@
 	<link href="css/style.css" rel="stylesheet">
 	
 	<script type="text/javascript" src="js/angular.js"></script>
+	<script type="text/javascript" src="js/bootstrap.js"></script>
 	<script type="text/javascript" src="js/controller.js"></script>
 	<script type="text/javascript" src="js/script.js"></script>
 </head>
@@ -36,7 +37,7 @@
 				Loading navbar...
 			</nav>
 
-				<!-- Collections and fields -->
+			<!-- Collections and fields -->
 			<div class="parallax" id="parallax-1">
 				<!-- Collections -->	
 				<div class="form-group">
@@ -53,7 +54,7 @@
 						<div class="input-group">
 							<label  class="input-group-addon"><strong>{{key}}</strong></label>
 							<input data-ng-model="currentCollection.fields[key].value" class="form-control"
-							type={{field.type[currentCollection.fields[key].type]}}
+							type={{currentCollection.fields[key].type}}
 							placeholder={{currentCollection.name}}.{{key}}
 							id="{{currentCollection.name}}_{{key}}" />
 						</div>
@@ -66,9 +67,10 @@
 						value={{messages[messages.current]['label_search']}} 
 						id="search_data" />
 
-					<input class="btn btn-default" type="button"
-						data-ng-click="openPopup(); $event.stopPropagation();"
-						value={{messages[messages.current]['label_addField']}} />
+					<button class="btn btn-default"
+						data-toggle="modal" data-target="#newField">
+						{{messages[messages.current]['label_addField']}}
+					</button>
 
 					<input class="btn btn-success" type="button"
 						data-ng-click="connection.insertData()"
@@ -78,8 +80,8 @@
 				<!-- end field -->
 			</div> <!-- end c and f -->
 
+			<!-- Data -->
 			<div class="parallax" id="parallax-2">
-				<!-- Data -->
 				<div class="col-md-8" style="border:;" data-ng-show="show.data">
 					<h1>Result data</h1>
 					<ul class="template-data">
@@ -105,43 +107,50 @@
 		<!-- They are out of container scope to not be blur -->
 		
 		<!-- new field -->
-		<div data-ng-class="class.popup" data-ng-keydown="closePopup($event)">
-			<div class="popup-content">
-				<form class="form-inline" role="form">
-					<div data-ng-show="show.newField" class="row">
-						<div class="input-group">
-							<input data-ng-model="field.new.name" class="form-control" type="text"  placeholder={{messages[messages.current]['message_addData']}} />
-							
-							<select class="form-control" data-ng-model="field.new.type" data-ng-change="field.updateTemplate(field.new)">
-								<option value="">{{messages[messages.current]['label_fieldType']}}</option>
-								<option value="number">Number</option>
-								<option value="text">String</option>
-								<option value="checkbox">Boolean</option>
-								<option value="object">Object</option>
-								<option value="array">Array</option>
-							</select>
-							<span class="input-group-btn">
-								<button class="btn btn-default" type="submit"
-									data-ng-click="field.add(); closePopup()">+</button>
-								<button class="btn btn-default" type="button"
-									data-ng-click="closePopup()">&times;</button>
-							</span>
+		<!-- Modal -->
+		<form>
+			<div class="modal fade bs-example-modal-lg" id="newField" tabindex="-1" role="dialog">
+				<div class="modal-dialog modal-lg">
+					<div class="modal-content">
+						<div class="modal-header" style="text-align:right">
+							<div class="btn-group">
+								<button type="submit" class="btn btn-primary" data-ng-click="field.add()" data-dismiss="modal">Add field</button>
+								<button type="button" class="btn btn-default" data-dismiss="modal">&times;</button>
+							</div>
 						</div>
-						
-						<input class="btn btn-default" type="button" value="+" 
-							data-ng-show="field.new.showAddChild" data-ng-click="field.addChild(field.new)" />
-						
-						<span data-ng-if="field.new.type == 'object'">
-							<ul>
-								<li data-ng-repeat="value in field.new.value">
-									<div data-ng-include="src='recursive-field-template.html'"></div>
-								</li>
-							</ul>
-						</span>
-					</div><!-- /.row -->
-				</form>
-			</div>
-		</div>
+						<div class="modal-body">
+							<div class="input-group">
+								<input data-ng-model="field.new.name" class="form-control" type="text"  placeholder={{messages[messages.current]['message_addData']}} />
+								<span class="input-group-btn">
+							        <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+							        	{{field.new.type[0]}} <span class="caret"></span>
+							        </button>
+							        <ul class="dropdown-menu">	
+							        	<li data-ng-repeat="fieldType in field.type">
+							        		<a  href="#{{fieldType}}"
+							        			
+							        			data-ng-click="field.updateTemplate(field.new, fieldType)">
+							        			{{fieldType}}
+							        		</a>
+							        	</li>
+							        </ul>
+									<input class="btn btn-default" type="button" value="+" 
+										data-ng-show="field.new.showAddChild" data-ng-click="field.addChild(field.new)" />
+								</span>
+							</div>
+									
+							<span data-ng-if="field.new.type == 'Object'">
+								<ul>
+									<li data-ng-repeat="value in field.new.value">
+										<div data-ng-include="src='recursive-field-template.html'"></div>
+									</li>
+								</ul>
+							</span>
+						</div> <!-- End modal body -->
+					</div> <!-- End modal content -->
+				</div>
+			</div> <!-- End modal -->
+		</form>
 
 	</div> <!-- End controller scope -->
 
@@ -178,31 +187,31 @@
 	<script type="text/ng-template" id="recursive-field-template.html">
 		<ul class="recursive-template">
 			<li>
-				<div class="row">
-					<div class="col-lg-12">
-						<div class="input-group">
-							<span class="input-group-btn">
-								<input class="btn btn-danger" type="button" value="-"
-								data-ng-click="field.selfDelete(this, $index)" />
-							</span>
-							<input data-ng-model="value.name" class="form-control" type="text"  placeholder={{messages[messages.current]['message_addData']}} />
-							<span class="input-group-btn">
-								<button class="btn btn-default" type="button"><span class="caret"></span></button>
-							</span>
-						</div>
-					</div>
+				<br />
+				<div class="input-group">
+					<span class="input-group-btn">
+						<input class="btn btn-danger" type="button" value="-"
+						data-ng-click="field.selfDelete(this, $index)" />
+					</span>
+					<input data-ng-model="value.name" class="form-control" type="text"  placeholder={{messages[messages.current]['message_addData']}} />
+					<span class="input-group-btn">
+				        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+				        	{{value.type[0]}} <span class="caret"></span>
+				        </button>
+				        <ul class="dropdown-menu">	
+				        	<li data-ng-repeat="fieldType in field.type">
+				        		<a  href="#{{fieldType}}"
+				        			
+				        			data-ng-click="field.updateTemplate(value, fieldType)">
+				        			{{fieldType}}
+				        		</a>
+				        	</li>
+				        </ul>
+						<input class="btn btn-default" type="button" value="+" 
+							data-ng-show="value.showAddChild" data-ng-click="field.addChild(value)" />
+					</span>
 				</div>
-				<select class="form-control" data-ng-model="value.type" data-ng-change="field.updateTemplate(value)">
-					<option value="">{{messages[messages.current]['label_fieldType']}}</option>
-					<option value="number">Number</option>
-					<option value="text">String</option>
-					<option value="checkbox">Boolean</option>
-					<option value="object">Object</option>
-					<option value="array">Array</option>
-				</select>
-					<input class="btn btn-default" type="button" value="+" 
-						data-ng-show="value.showAddChild" data-ng-click="field.addChild(value)" />
-				<span data-ng-if="value.type == 'object'">
+				<span data-ng-if="value.type == 'Object'">
 					<ul>
 						<li data-ng-repeat="value in value.value">
 							<div data-ng-include="src='recursive-field-template.html'"></div>

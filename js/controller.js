@@ -9,18 +9,12 @@ var mongoApp = angular.module('mongoApp', [])
 			console.log(message);
 	}
 
-// ---- CREATING $scope model -------------------------------------------------]
+// ---- CREATING $scope model -------------------------------------------------
 
 	$scope.connection = {}; //functions
 	$scope.field = {}; //functions
-	$scope.field.type = {
-		"text": "text",
-		"string": "text",
-		"number": "number",
-		"double": "number",
-		"float": "number",
-		"int": "number",
-	};
+
+	$scope.field.type = ["Number", "Text", "Checkbox", "Object", "Array"];
 	$scope.show = {}; //show and hide flags
 	$scope.debug = true;
 	$scope.connection.connect = true;
@@ -55,8 +49,12 @@ var mongoApp = angular.module('mongoApp', [])
 		have a todo in "field"
 
 		hide data if all documents was deleted
-
 		
+		new field dropdow and add child style problem (border in drop)
+
+		remove br's
+
+		add tabindex in ngrepeats		
 
 	 */
 
@@ -98,33 +96,25 @@ var mongoApp = angular.module('mongoApp', [])
 	}
 	$scope.connection.loadCollections();
 
-	$scope.connection.loadFields = function() {
-		$scope.consolelog("\n\nLoading Fields");
-		$scope.show.fields = false; //first hide the old fields
-		$scope.show.showLoading("Loading fields");
 
-		//if the collection is null, nothing is done and nothing is showed
-		if(!$scope.currentCollection) {
+// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
+
+
+	$scope.connection.loadFields = function() {
+		showLogAngLoading("Loading fields");
+
+		if(!shouldConnectToloadFields($scope.currentCollection)) {
 			$scope.show.clearLoading();
-			$scope.show.data = false;
 			return;
 		}
 
-		$scope.data = $scope.currentCollection.data;
-		
-		//not implemented yet
-		if($scope.collections.persistFieldValues == false)
+		//not implemented yet @todo
+		if($scope.currentCollection.persistFieldValues == false)
 			$scope.field.clear();
 
-		//if a connection has already been made, doesn't need to do it again
-		if($scope.currentCollection.fields) {
-			$scope.show.fields = true;
-			$scope.show.data = true;
-			$scope.show.clearLoading();
-			return;
-		}
-
-		if(!$scope.connection.connect) return;
 		$http.post("php/loadFields.php", {"collectionName": $scope.currentCollection.name})
 			.success(function(response) {
 				$scope.currentCollection.fields = response;
@@ -141,6 +131,44 @@ var mongoApp = angular.module('mongoApp', [])
 				console.log(response);
 		});
 	}
+	showLogAngLoading = function(description) {
+		$scope.consolelog("\n\n" + description);
+		$scope.show.showLoading(description);
+	}
+	shouldConnectToloadFields = function(collection) {
+		if(collectionIsNull(collection))
+			return false;
+		if(fieldsAlreadyExist(collection))
+			return false;
+		if(!$scope.connection.connect) //flag to not execute connection
+			return false;
+
+		$scope.show.data = false;
+		$scope.show.fields = false;
+		return true;
+	}	
+	collectionIsNull = function(collection) {
+		if(!collection) {
+			$scope.show.data = false;
+			$scope.show.fields = false;
+			return true;
+		}
+		return false;
+	}
+	fieldsAlreadyExist = function(collection) {
+		if(collection.fields) {
+			$scope.show.data = true;
+			$scope.show.fields = true;
+			return true;
+		}
+		return false;
+	}
+
+// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 	$scope.connection.loadData = function() {
 		$scope.consolelog("\n\nLoading data");
@@ -268,6 +296,7 @@ var mongoApp = angular.module('mongoApp', [])
 			}
 			return temporaryObject;
 		}
+		return field.type;
 	}
 
 	$scope.field.add = function(field) {
@@ -289,23 +318,30 @@ var mongoApp = angular.module('mongoApp', [])
 	
 	$scope.field.template = {
 		name: "",
-		type: "text",
+		type: "Text",
 		value: ""
 	}
 	$scope.field.new = angular.copy($scope.field.template);
 
-	$scope.field.updateTemplate = function(field) {
-		console.log($scope.field.new);
-		if(field.type == "object") {
+	$scope.field.updateTemplate = function(field, fieldType) {
+		field.type = fieldType;
+
+		console.log(field);
+		//field.type == "object" ? updateTemplateAsObject(field) : updateTemplateAsNotObject(field) 
+		if(field.type == "Object") {
 			field.value = [];
 			field.value.push(angular.copy($scope.field.template));
 			field.showAddChild = true;
 		}
 		else {
 			field.value = "";
-			field.showNew = true;
+			field.showAddChild = false;
 		}
 	}
+	/*$scope.field.updateTemplateAsObject = function(field) {
+
+	}*/
+
 	$scope.field.addChild = function(field) {
 		field.value.push(angular.copy($scope.field.template));
 	}
