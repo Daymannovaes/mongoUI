@@ -65,8 +65,8 @@ function loadData($collection, $request) {
 	$caster = $collection->findOne();
 	
 	$criteria = deleteEmptyFields($criteria);
-	$criteria = deleteTypeFields($criteria);
-	//$criteria = castCriteria($criteria, $caster);
+	$criteria = prepareCriteria($criteria);
+
 
 	$cursor = $collection->find($criteria);
 
@@ -83,15 +83,6 @@ function loadData($collection, $request) {
 	echo json_encode($data);
 }
 
-function castCriteria($criteria, $fields) {
-	foreach($fields as $key => $value) {
-		$type = gettype($value);
-		if(isset($criteria[$key]) && ($type == "double" || $type == "float" || $type == "int"))
-			$criteria[$key] = (double)$criteria[$key];
-	}
-	return $criteria;
-}
-
 //if a field is empty, it is deleted from the criteria array
 function deleteEmptyFields($fields) {
 	foreach($fields as $key => $value) {
@@ -100,10 +91,9 @@ function deleteEmptyFields($fields) {
 	}
 	return $fields;
 }
-function deleteTypeFields($fields) {
+function prepareCriteria($fields) {
 	foreach($fields as $key => $value) {
-		// $fields[$key] = $fields[$value]
-		unset($fields[$key]["type"]);
+		$fields[$key] = $fields[$key]["value"];
 	}
 	return $fields;
 }

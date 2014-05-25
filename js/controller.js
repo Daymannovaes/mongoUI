@@ -10,12 +10,13 @@ var mongoApp = angular.module('mongoApp', [])
 	}
 
 // ---- CREATING $scope model -------------------------------------------------
-
 	$scope.connection = {}; //functions
-	$scope.field = {}; //functions
 
+	$scope.field = {}; //functions
 	$scope.field.type = ["Number", "Text", "Checkbox", "Object", "Array"];
+
 	$scope.show = {}; //show and hide flags
+
 	$scope.debug = true;
 	$scope.connection.connect = true;
 
@@ -49,33 +50,19 @@ var mongoApp = angular.module('mongoApp', [])
 		have a todo in "field"
 
 		hide data if all documents was deleted
-		
-		new field dropdow and add child style problem (border in drop)
 
 		remove br's
 
-		add tabindex in ngrepeats		
+		add tabindex in ngrepeats
+
+		improve the javascript (jquery css) in select type in new field.	
 
 	 */
 
-
-	$scope.show.showLoading = function(label) {
-		$scope.label_loading = label != undefined ? label : $scope.label_loading;
-		$scope.class.container[1] = "container-blur";
-		$scope.show.loading = true;
-	}
-	$scope.show.clearLoading = function() {
-		$scope.label_loading = "";
-		$scope.class.container[1] = "container-focus";
-		$scope.show.loading = false;
-	}
-
-	
 // --------------------------------------------------------------------------------------------------------------------
-
 // --------------------------------------------------------------------------------------------------------------------
-
 // ---- CONNECTION methods ----- methods that connect with database -----------
+
 	$scope.connection.loadCollections = function() {
 		$scope.consolelog("Getting collection names from the server");
 		$scope.show.showLoading();
@@ -94,18 +81,10 @@ var mongoApp = angular.module('mongoApp', [])
 			console.log(error);
 		});
 	}
-	$scope.connection.loadCollections();
 
-
-// --------------------------------------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------------------------------------
-
-
+// ----------------------------------------------------------------------------
+// ---- LOAD FIELDS methods
 	$scope.connection.loadFields = function() {
-		showLogAngLoading("Loading fields");
-
 		if(!shouldConnectToloadFields($scope.currentCollection)) {
 			$scope.show.clearLoading();
 			return;
@@ -114,6 +93,8 @@ var mongoApp = angular.module('mongoApp', [])
 		//not implemented yet @todo
 		if($scope.currentCollection.persistFieldValues == false)
 			$scope.field.clear();
+
+		showLogAngLoading("Loading fields for " + $scope.currentCollection.name);
 
 		$http.post("php/loadFields.php", {"collectionName": $scope.currentCollection.name})
 			.success(function(response) {
@@ -124,16 +105,12 @@ var mongoApp = angular.module('mongoApp', [])
 				//focus first field after 10 milisseconds
 				setTimeout(function() {$("form#form_fields input:first").focus()}, 100);
 
+				console.log(response);
 				$scope.consolelog("Load fields successful");
 			}).error(function(error) {
 				$scope.consolelog("Error while loading fields from server.");
 				console.log(error);
-				console.log(response);
 		});
-	}
-	showLogAngLoading = function(description) {
-		$scope.consolelog("\n\n" + description);
-		$scope.show.showLoading(description);
 	}
 	shouldConnectToloadFields = function(collection) {
 		if(collectionIsNull(collection))
@@ -163,24 +140,22 @@ var mongoApp = angular.module('mongoApp', [])
 		}
 		return false;
 	}
+// ---- END load fields methods
+// ----------------------------------------------------------------------------
 
-// --------------------------------------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------------------------------------------
 
+// ----------------------------------------------------------------------------
+// ---- LOAD DATA methods
 	$scope.connection.loadData = function() {
-		$scope.consolelog("\n\nLoading data");
-
-		$scope.show.data = true; //first hide the old fields
 		if(!$scope.connection.connect) return;
-		$scope.show.showLoading("Loading data");
 
 		var data = {
 			collectionName: $scope.currentCollection.name,
 			fields: $scope.currentCollection.fields
 		};
+		$scope.show.data = false; //first hide the old data
+
+		showLogAngLoading("Loading data for " + $scope.currentCollection.name);
 
 		$http.post("php/loadData.php", data)
 			.success(function(response) {
@@ -189,7 +164,6 @@ var mongoApp = angular.module('mongoApp', [])
 				$scope.show.clearLoading();
 				$scope.show.data = true;
 
-				console.log(response);
 				$scope.consolelog("Load data successful");
 
 				$("html, body").animate({
@@ -198,14 +172,19 @@ var mongoApp = angular.module('mongoApp', [])
 			}).error(function(error) {
 				$scope.consolelog("Error while loading data from server.");
 				console.log(error);
+				console.log(response);
 			});
 		//executeConnection("POST", "php/ListData.php", false, data, onloadCallback);
 	}
+// ---- END load data methods
+// ----------------------------------------------------------------------------
+
+
+// ----------------------------------------------------------------------------
+// ---- INSERT DATA methods
 	$scope.connection.insertData = function() {
 		//@todo receive data as parameter
 		$scope.consolelog("\n\nInserting data");
-
-		var data = new FormData();
 
 		var data = {
 			collectionName: $scope.currentCollection.name,
@@ -235,13 +214,19 @@ var mongoApp = angular.module('mongoApp', [])
 				console.log(response);
 			});
 	}
+// ---- END insert data methods
+// ----------------------------------------------------------------------------
+
+
+// ----------------------------------------------------------------------------
+// ---- DELETE data methods
 	$scope.connection.deleteData = function(dataNumber) {
-		$scope.consolelog("\n\nDeleting data");
 
 		if(!confirm($scope.messages[$scope.messages.current]["message_confirmDelete"])) {
 			$scope.consolelog("Delete canceled");
 			return;
 		}
+		$scope.consolelog("\n\nDeleting data");
 		$scope.show.showLoading("Deleting data");
 
 		console.log("data: ");
@@ -266,21 +251,47 @@ var mongoApp = angular.module('mongoApp', [])
 				console.log(response);				
 			});
 	}
+// ---- END delete data methods
+// ----------------------------------------------------------------------------
+
+
+	showLogAngLoading = function(description) {
+		$scope.consolelog("\n\n" + description);
+		$scope.show.showLoading(description);
+	}
+	$scope.show.showLoading = function(label) {
+		$scope.label_loading = label != undefined ? label : $scope.label_loading;
+		$scope.class.container[1] = "container-blur";
+		$scope.show.loading = true;
+	}
+	$scope.show.clearLoading = function() {
+		$scope.label_loading = "";
+		$scope.class.container[1] = "container-focus";
+		$scope.show.loading = false;
+	}
 
 	$scope.connection.changeData = function(data) {
 		console.log(data);
-		if(confirm("Update data is not working yet"))
-			data["nome"] = "deu certo";
+		//if(confirm("Update data is not working well yet, want to continue?"))
+			$scope.dataType = "text";
+			
+		//data["nome"] = "deu certo";
 	}
 	$scope.connection.commitActions = function(data) {
-		window.alert("Commit is not working yet");
+		//window.alert("Commit is not working yet");
+		
+		$scope.dataType = "button";
 	}
+	$scope.dataType = "button"; 
+// ---- END commit actions methods
+// ----------------------------------------------------------------------------
+
+
+	$scope.connection.loadCollections();
 // ---- END connection methods ------------------------------------------------
-	
-
+// --------------------------------------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------------------------------------
 
-// --------------------------------------------------------------------------------------------------------------------
 
 // ---- NEW FIELD methods -----------------------------------------------------
 	//@TODO consist the names, repeateds, empts and etc
@@ -299,7 +310,7 @@ var mongoApp = angular.module('mongoApp', [])
 		return field.type;
 	}
 
-	$scope.field.add = function(field) {
+	$scope.field.addNew = function(field) {
 		$scope.currentCollection.fields[$scope.field.new.name] = {
 			value: "",
 			type: $scope.field.arrayToObject($scope.field.new)
@@ -349,53 +360,18 @@ var mongoApp = angular.module('mongoApp', [])
 
 
 		realParent = field.$parent.$parent.$parent.$parent.value ?
-						field.$parent.$parent.$parent.$parent.value.value :
-						field.$parent.$parent.$parent.field.new.value;
+						field.$parent.$parent.$parent.$parent.value :
+						field.$parent.$parent.$parent.field.new;
 
-		if(realParent.length > 1) {
-			realParent.splice(fieldNumber, 1);
+		if(realParent.value.length > 1) {
+			realParent.value.splice(fieldNumber, 1);
 			delete field;
 		}
-	}
-
-	// ---- POPUP VISIBILITY methods ------------------------------------------
-	$scope.openPopup = function() {
-		$scope.show.newField = true;
-
-		$scope.class.container[1] = "container-blur";
-		$scope.class.popup[1] = "popup-show";
-
-		//set focus to the field ten milisseconds after, because of the delay to show popup
-		setTimeout(function(){$(".popup-show input[type='text']").focus()}, 10);
-	}
-	$scope.closePopup = function(event) {
-		if(!event || event.which == 27) {
-			$scope.class.container[1] = "container-focus";
-			$scope.class.popup[1] = "popup-hide";
-			$scope.field.new = angular.copy($scope.field.template); //clear properties
-
-			$scope.show.newField = false;
-		}
-	}
-	$scope.containerClosepopup = function() {
-		if($scope.show.newField)
-			$scope.closePopup();
 	}	
 // ---- END new field methods ------------------------------------------------
 
 
-
-	//only console.log
-	$scope.showCollections = function() {
-		console.log("Collections: ");
-		console.log($scope.collections);
-
-		console.log("\nactual collection: ");
-		console.log($scope.currentCollection);
-
-	}	
-
-	//used in recursive template (show data)
+// ---- HELPER methods in recursive template (will be deprecated when node and jade comes)
 		$scope.typeOf = function(input) {
 		    return typeof input;
 		}
@@ -408,29 +384,7 @@ var mongoApp = angular.module('mongoApp', [])
 		$scope.isNumber = function(input) {
 			return !isNaN(parseInt(input));
 		}
-
-	$scope.toggle = function(data, key) {
-		$scope.consolelog(data);
-		data["show"+key] = data["show"+key] ? !data["show"+key] : true;
-	}
-
-
-
-
-	 $scope.addParentProperty = function(data, parentName) {
-	 	if(parentName && data instanceof Array)
-	 		data["parentName"] = parentName;
-	 	
-	 	for(attr in data) {
-	 		if(typeof data[attr] == "object")
-	 			$scope.addParentProperty(data[attr], attr);
-	 	}
-	 }
-	 //@todo create add level property
-	 //@todo consider the possibility of a stak model with one level
-	 $scope.getParentByParentNameProperty = function(data, parentName) {
-
-	 }
+// ----- END helper methods --------------------------------------------------------------
 
 	 	/**
 	 * Only for debug and test where the mongoDB not work

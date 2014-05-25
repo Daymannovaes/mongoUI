@@ -8,6 +8,14 @@ window.onresize = function() {
 	updateModalHeight();
 }
 
+addModifiedStyle = function(field) {
+	$(field).css("border-bottom", "1px dotted red");
+	$(field).parent().parent().children().first().css("border-left", "1px dotted red");
+	$(field).parent().parent().children().first().css("padding-left", "3px");
+
+	//able the commit button
+}
+
 var updateParallaxHeight = function() {
 	$("#parallax-1").css("height", window.innerHeight);
 

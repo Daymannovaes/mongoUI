@@ -34,6 +34,7 @@ function connect($collectionName) {
 }
 
 function loadFields($collection) {
+
 	//echo "\nIniciando busca de campos";
 	//$response = Array();
 
@@ -48,11 +49,19 @@ function loadFields($collection) {
 	//return only the column names
 	foreach($cursor as $key => $value) {
 		$fields[$key]["value"] = "";
-		$fields[$key]["type"] = gettype($value);
+		$fields[$key]["type"] = $casterToHTML[gettype($value)];
 	}
 	echo json_encode($fields);
 }
 function _loadFields($collection) {
+	$casterToHTML = Array(
+		"double" => "number",
+		"integer" => "number",
+		"boolean" => "checkbox",
+		"string" => "text",
+		"object" => "object",
+		"array" => "array",
+	);
 	//echo "\nIniciando busca de campos";
 	//$response = Array();
 
@@ -69,7 +78,7 @@ function _loadFields($collection) {
 		foreach($document as $key => $value) {
 			if(!keyExists($columns, $key)) {
 				$columns[$key]["value"] = "";
-				$columns[$key]["type"] = gettype($value);
+				$columns[$key]["type"] = $casterToHTML[gettype($value)];
 			}
 		}
 	}

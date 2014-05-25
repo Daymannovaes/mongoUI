@@ -16,8 +16,6 @@
 </head>
 <body data-ng-app="mongoApp">
 	<!-- @todo
-		Create .class and .show properties in $scope, to separete the
-		Also separate all methods in $scope properties (field methods, data, show, class and etc)
 		remove <br>'s
 	-->
 	<div data-ng-controller="collectionController">
@@ -77,15 +75,15 @@
 						value={{messages[messages.current]['label_insertData']}} />
 
 				</form>
-				<!-- end field -->
+				<!-- end fields -->
 			</div> <!-- end c and f -->
 
 			<!-- Data -->
-			<div class="parallax" id="parallax-2">
-				<div class="col-md-8" style="border:;" data-ng-show="show.data">
-					<h1>Result data</h1>
-					<ul class="template-data">
-						<li data-ng-repeat="value in currentCollection.data">
+			<div class="parallax" id="parallax-2" data-ng-show="show.data">
+				<h1>Result data</h1>
+				<ul class="template-data">
+					<li data-ng-repeat="value in currentCollection.data">
+						<form data-ng-submit="connection.commitActions(value)">
 							<div class="btn-group">
 								<button type="button" class="btn btn-default" data-ng-click="connection.deleteData($index)">
 									{{messages[messages.current]['label_deleteData']}}
@@ -93,52 +91,61 @@
 								<button type="button" class="btn btn-default" data-ng-click="connection.changeData(value)">
 									{{messages[messages.current]['label_changeData']}}
 								</button>
-								<button type="button" class="btn btn-danger" data-ng-click="connection.commitActions(value)">
+								<button type="submit" class="btn btn-danger" data-ng-click="connection.commitActions(value)">
 									Commit
 								</button>
 							</div>
 							<div data-ng-include="src='recursive-data-template.html'"></div>
-						</li>
-					</ul>
-				</div> <!-- End data -->
+						</form>
+					</li>
+				</ul>
 			</div>
+			<!-- End data -->
 		</div> <!-- End container scope -->
 
 		<!-- They are out of container scope to not be blur -->
 		
-		<!-- new field -->
-		<!-- Modal -->
+		<!-- new field | Modal -->
 		<form>
 			<div class="modal fade bs-example-modal-lg" id="newField" tabindex="-1" role="dialog">
 				<div class="modal-dialog modal-lg">
 					<div class="modal-content">
+
+						<!-- Header: add and close -->
 						<div class="modal-header" style="text-align:right">
 							<div class="btn-group">
-								<button type="submit" class="btn btn-primary" data-ng-click="field.add()" data-dismiss="modal">Add field</button>
+								<button type="submit" class="btn btn-primary" data-ng-click="field.addNew()" data-dismiss="modal">
+									{{messages[messages.current]['label_addField']}}
+								</button>
 								<button type="button" class="btn btn-default" data-dismiss="modal">&times;</button>
 							</div>
 						</div>
+
+						<!-- Real content -->
 						<div class="modal-body">
+
+							<!-- Field and select type -->
 							<div class="input-group">
 								<input data-ng-model="field.new.name" class="form-control" type="text"  placeholder={{messages[messages.current]['message_addData']}} />
-								<span class="input-group-btn">
-							        <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+
+								<!-- Select type and add child -->
+								<div class="input-group-btn">
+							        <button class="btn btn-default" data-toggle="dropdown">
 							        	{{field.new.type[0]}} <span class="caret"></span>
 							        </button>
 							        <ul class="dropdown-menu">	
 							        	<li data-ng-repeat="fieldType in field.type">
-							        		<a  href="#{{fieldType}}"
-							        			
-							        			data-ng-click="field.updateTemplate(field.new, fieldType)">
+							        		<a data-ng-click="field.updateTemplate(field.new, fieldType)">
 							        			{{fieldType}}
 							        		</a>
 							        	</li>
 							        </ul>
 									<input class="btn btn-default" type="button" value="+" 
 										data-ng-show="field.new.showAddChild" data-ng-click="field.addChild(field.new)" />
-								</span>
-							</div>
-									
+								</div> <!-- End st and ac -->
+							</div> <!-- End f and c -->
+
+							<!-- Children recursive -->									
 							<span data-ng-if="field.new.type == 'Object'">
 								<ul>
 									<li data-ng-repeat="value in field.new.value">
@@ -150,59 +157,64 @@
 					</div> <!-- End modal content -->
 				</div>
 			</div> <!-- End modal -->
-		</form>
+		</form> <!-- End new field -->
 
 	</div> <!-- End controller scope -->
 
 
-	<!-- recursive template for data show -->
-	<!-- @todo problem in ng-show (all ngshow after the first are showed) 
-			Do not add control properties in the iterated object 
-	-->
-	<!-- @todo use twig -->
-	<!-- @todo consider if is an array or object -->
+<!-- - - - - All recursive templates -->
+
+	<!-- Template for data show -->
+	<!-- @todo use twig | jade -->
 	<script type="text/ng-template" id="recursive-data-template.html">
-		<ul class="recursive-template">
+		<ul class="recursive-data-template recursive-template">
 			<li data-ng-repeat="(key, value) in value">
 				<span data-ng-if="!isNumber(key)"> 
 					{{key}}: 
 				</span>
+
 				<span data-ng-if="typeOf(value) != 'object'">
-				{{value}}<span data-ng-if="!$last"><span class="notation">,</span></span>
+					<input type="{{dataType}}" class="form-control " value="{{value}}" onchange="addModifiedStyle(this)"/>
+					<span data-ng-if="!$last" class="notation">,</span>
 				</span>
+
 				<span data-ng-if="isArray(value)">
 					<span class="notation">[</span>
 					<div data-ng-include="src='recursive-data-template.html'"></div>
-					<span class="notation">]</span><span data-ng-if="!$last"><span class="notation">,</span></span>
+					<span class="notation">]</span><span data-ng-if="!$last" class="notation">,</span>
 				</span>
+
 				<span data-ng-if="isObjectAndNotArray(value)">
 					<span class="notation">{</span>
 					<div data-ng-include="src='recursive-data-template.html'"></div>
-					<span class="notation">}</span><span data-ng-if="!$last"><span class="notation">,</span></span>
+					<span class="notation">}</span><span data-ng-if="!$last" class="notation">,</span></span>
 				</span>
 			</li>
 		</ul>
 	</script>
 
+	<!-- Template for field show -->
+	<!-- @todo verticalize buttons -->
 	<script type="text/ng-template" id="recursive-field-template.html">
-		<ul class="recursive-template">
+		<ul class="recursive-field-template recursive-template">
 			<li>
 				<br />
 				<div class="input-group">
-					<span class="input-group-btn">
+					<div class="input-group-btn">
 						<input class="btn btn-danger" type="button" value="-"
 						data-ng-click="field.selfDelete(this, $index)" />
-					</span>
-					<input data-ng-model="value.name" class="form-control" type="text"  placeholder={{messages[messages.current]['message_addData']}} />
+					</div>
+
+					<input data-ng-model="value.name" class="form-control" type="text"
+						placeholder={{messages[messages.current]['message_addData']}} />
+
 					<span class="input-group-btn">
-				        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+				        <button class="btn btn-default" data-toggle="dropdown">
 				        	{{value.type[0]}} <span class="caret"></span>
 				        </button>
 				        <ul class="dropdown-menu">	
 				        	<li data-ng-repeat="fieldType in field.type">
-				        		<a  href="#{{fieldType}}"
-				        			
-				        			data-ng-click="field.updateTemplate(value, fieldType)">
+				        		<a data-ng-click="field.updateTemplate(value, fieldType)">
 				        			{{fieldType}}
 				        		</a>
 				        	</li>
@@ -220,37 +232,6 @@
 				</span>
 			</li>
 		</ul>
-	</script>
-
-	<!-- This is deprecated (soon will be removed) -->
-	<script type="text/ng-template" id="_recursive-data-template.html">
-		<span data-ng-if="typeOf(data) == 'string'">{{data}}</span>
-		<div data-ng-if="typeOf(data) != 'string'" data-ng-repeat="document in data">
-			<table class="table table-striped table-hover">
-				<thead>
-					<tr>
-						<th data-ng-repeat="(key, value) in document" data-ng-if="typeOf(data) != 'boolean'">
-							{{key}}
-						</th>
-						<td style="text-align:right">
-							<input class="btn btn-warning" type="button" data-ng-click="connection.changeData($parent)" value={{messages[messages.current]['label_changeData']}} />
-						</td>
-					</tr>
-				</thead>						
-				<tr>
-					<td data-ng-repeat="(key, data) in document">
-						<span data-ng-if="typeOf(data) != 'object' && typeOf(data) != 'boolean'">{{data}}</span>
-						<span data-ng-if="typeOf(data) == 'object' && typeOf(data) != 'boolean'">
-							<input type="button" class="btn btn-primary" data-ng-click="toggle(document, key)" value="{{messages[messages.current]['label_showData']}} {{key}}"/>
-							<div data-ng-show="document.show{{key}}" data-ng-include="'recursive-data-template.html'"><div>
-						</span>
-					</td>
-					<th style="text-align:right">
-						<input class="btn btn-danger" type="button" data-ng-click="connection.changeData($index)" value={{messages[messages.current]['label_deleteData']}} />
-					</th>
-				</tr>
-			</table>
-		</div>
 	</script>
 </body>
 </html>
