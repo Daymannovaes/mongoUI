@@ -57,6 +57,8 @@ var mongoApp = angular.module('mongoApp', [])
 
 		improve the javascript (jquery css) in select type in new field.	
 
+		refactor insert data
+
 	 */
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -184,12 +186,8 @@ var mongoApp = angular.module('mongoApp', [])
 // ---- INSERT DATA methods
 	$scope.connection.insertData = function() {
 		//@todo receive data as parameter
-		$scope.consolelog("\n\nInserting data");
+		showLogAngLoading("Inserting data");
 
-		var data = {
-			collectionName: $scope.currentCollection.name,
-			fields: $scope.currentCollection.fields
-		};
 
 		if($scope.currentCollection.data == undefined) $scope.currentCollection.data = [];
 		obj = {};
@@ -198,7 +196,12 @@ var mongoApp = angular.module('mongoApp', [])
 		$scope.currentCollection.data.push(obj);
 		$scope.show.data = true;
 		$scope.field.clear();
-		return;
+
+		var data = {
+			collectionName: $scope.currentCollection.name,
+			data: obj
+		};
+
 		if(!$scope.connection.connect) return;
 		$http.post("php/insertData.php", data)
 			.success(function(response) {
@@ -206,7 +209,7 @@ var mongoApp = angular.module('mongoApp', [])
 				console.log(response);
 				$scope.field.clear();
 
-				$scope.show.loading_data = false;
+				$scope.show.clearLoading();
 				$scope.consolelog("Insert data successful");
 			}).error(function(error) {
 				$scope.consolelog("Error while inserting data in server.");

@@ -1,30 +1,27 @@
 window.onload = function() {
-	updateParallaxHeight();
+	updateContainerHeight();
 	updateModalHeight();
 	setItemInDropdownAsSelected();
 }
 window.onresize = function() {
-	updateParallaxHeight();
+	updateContainerHeight();
 	updateModalHeight();
 }
 
 addModifiedStyle = function(field) {
 	$(field).css("border-bottom", "1px dotted red");
-	$(field).parent().parent().children().first().css("border-left", "1px dotted red");
+	$(field).parent().parent().children().first().css("border-left", "1px solid red");
 	$(field).parent().parent().children().first().css("padding-left", "3px");
 
 	//able the commit button
 }
 
-var updateParallaxHeight = function() {
-	$("#parallax-1").css("height", window.innerHeight);
-
-	$("#parallax-2").css("top", window.innerHeight);
-	$("#parallax-2").css("min-height", window.innerHeight);
+var updateContainerHeight = function() {
+	$("#form, #data").css("min-height", window.innerHeight);
 
 	navbarHeight = (parseInt($("nav").css("height"), 10)*2) || 50;
 
-	$("#parallax-2").css("padding-top", navbarHeight);
+	$("#data").css("padding-top", navbarHeight);
 }
 var updateModalHeight = function() {
 	$("#newField .modal-content").css("min-height", window.innerHeight*0.8);
