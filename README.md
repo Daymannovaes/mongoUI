@@ -14,7 +14,7 @@ mongoUI
 * List collection data.
 * Insert data.
 * Remove data.
-* Translated messages and labels!.
+* Translate messages and labels!.
 
 To run mongoUI you'll need mongoDB installed and the PHP drive of mongo.
 
